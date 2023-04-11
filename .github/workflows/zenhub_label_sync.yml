@@ -2,9 +2,44 @@ name: Zenhub Label Sync
 
 on:
   workflow_dispatch:
+    inputs:
+      type:
+        description: 'Event type'
+        required: true
+      github_url:
+        description: 'GitHub URL'
+        required: true
+      organization:
+        description: 'Organization name'
+        required: true
+      repo:
+        description: 'Repository name'
+        required: true
+      user_name:
+        description: 'User name'
+        required: true
+      issue_number:
+        description: 'Issue number'
+        required: true
+      issue_title:
+        description: 'Issue title'
+        required: true
+      to_pipeline_name:
+        description: 'To pipeline name'
+        required: true
+      workspace_id:
+        description: 'Workspace ID'
+        required: true
+      workspace_name:
+        description: 'Workspace name'
+        required: true
+      from_pipeline_name:
+        description: 'From pipeline name'
+        required: true
+
   repository_dispatch:
     types: [zenhub.issue_transferred]
-
+    
 jobs:
   sync_labels:
     runs-on: ubuntu-latest
