@@ -20,6 +20,7 @@ jobs:
             "Review/QA": "review-or-qa",
             "Done": "done"
           };
+          const context = github.context;
           const columnName = context.payload.client_payload.webhook.metadata.column_name;
           const labelName = columnMapping[columnName];
 
