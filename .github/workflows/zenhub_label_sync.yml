@@ -13,7 +13,6 @@ jobs:
       uses: actions/github-script@v5
       with:
         script: |
-          const { client, context } = github;
           const columnMapping = {
             "Product Backlog": "product-backlog",
             "Sprint Backlog": "sprint-backlog",
@@ -37,7 +36,7 @@ jobs:
             .filter(name => !Object.values(columnMapping).includes(name))
             .concat([labelName]);
 
-          await client.rest.issues.setLabels({
+          await github.rest.issues.setLabels({
             owner: repo.owner.login,
             repo: repo.name,
             issue_number: issue.number,
