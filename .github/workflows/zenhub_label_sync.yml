@@ -45,8 +45,8 @@ jobs:
       uses: actions/github-script@v5
       with:
         script: |
-          console.log("AAAAAAAAA");
-          console.log(JSON.stringify(github));
+          console.log("PRINT GITHUB INPUT");
+          console.log({github});
           const columnMapping = {
             "Product Backlog": "product-backlog",
             "Sprint Backlog": "sprint-backlog",
