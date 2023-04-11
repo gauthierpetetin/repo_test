@@ -46,7 +46,7 @@ jobs:
       with:
         script: |
           console.log("PRINT GITHUB EVENT");
-          console.log({github-event: github.event});
+          console.log({github: github.event});
           const columnMapping = {
             "Product Backlog": "product-backlog",
             "Sprint Backlog": "sprint-backlog",
