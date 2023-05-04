@@ -1,4 +1,4 @@
-name: Label PR and Linked Issues with Next Release Cut Number
+name: Add release label on PR and its linked issues when PR gets merged
 
 on:
   pull_request:
@@ -32,14 +32,22 @@ jobs:
       - name: Add release label to PR and linked issues
         uses: actions/github-script@v5
         with:
-          script: |
-            const all_issues_to_label_json = ${{ steps.get_issues_to_label.outputs.all_issues_to_label }};
-            const all_issues_to_label = all_issues_to_label_json ? JSON.parse(all_issues_to_label_json) : [];
-            const next_release_cut_number = process.env.NEXT_RELEASE_CUT_NUMBER; // This value is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo. It needs to be updated every time a new release is cut. Example value: 6.5
-
+          script: |         
+            // Next release cut number is defined thanks NEXT_RELEASE_CUT_NUMBER env variable.
+            // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
+            // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
+            // Example value: 6.5
+            const next_release_cut_number = process.env.NEXT_RELEASE_CUT_NUMBER;
             if (!next_release_cut_number) {
               throw new Error("The NEXT_RELEASE_CUT_NUMBER environment variable is not defined.");
             }
+            
+            // Release label needs to indicate the next release cut number
+            // Example release label: "release-6.5"
+            const release_label = `release-{next_release_cut_number}`;
+            
+            const all_issues_to_label_json = ${{ steps.get_issues_to_label.outputs.all_issues_to_label }};
+            const all_issues_to_label = all_issues_to_label_json ? JSON.parse(all_issues_to_label_json) : [];
 
             const addLabel = async (issue_number, owner, repo) => {
               await github.rest.issues.addLabels({
