@@ -19,6 +19,10 @@ jobs:
           echo "Fetching PR #$PR_NUMBER in $REPO"
           PR_ISSUE=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq '{number: .number, owner: .base.repo.owner.login, repo: .base.repo.name}')
           
+          echo "PR_ISSUE: #$PR_ISSUE"
+          LINKED_ISSUES_TEST=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq '{linkedIssues: .linkedIssues}')
+          echo "LINKED_ISSUES_TEST: #$LINKED_ISSUES_TEST"
+          
           echo "Fetching linked issues for PR #$PR_NUMBER in $REPO and other repos"
           LINKED_ISSUES=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq ".linkedIssues.nodes[]? | {number: .number, owner: .repository.owner.login, repo: .repository.name}") || "[]"
           
