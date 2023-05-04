@@ -20,7 +20,7 @@ jobs:
           PR_ISSUE=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq '{number: .number, owner: .base.repo.owner.login, repo: .base.repo.name}')
           
           echo "Fetching linked issues for PR #$PR_NUMBER in $REPO and other repos"
-          LINKED_ISSUES=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq ".linkedIssues.nodes[] | {number: .number, owner: .repository.owner.login, repo: .repository.name}")
+          LINKED_ISSUES=$(gh api repos/$REPO/pulls/$PR_NUMBER --jq ".linkedIssues.nodes[]? | {number: .number, owner: .repository.owner.login, repo: .repository.name}") || "[]"
           
           ALL_ISSUES_TO_LABEL="[$PR_ISSUE,${LINKED_ISSUES}]"
           echo "::set-output name=all_issues_to_label::${ALL_ISSUES_TO_LABEL}"
