@@ -1,59 +1,81 @@
-const { GitHub, context } = require("@actions/github");
+import { context, getOctokit } from '@actions/github';
+import { GitHub } from '@actions/github/lib/utils';
 
-const githubToken = process.env.GITHUB_TOKEN;
-const prNumber = process.env.PR_NUMBER;
-const prRepo = process.env.PR_REPO;
-const prRepoOwner = prRepo.split('/')[0];
-const prRepoName = prRepo.split('/')[1];
+const nextReleaseCutNumber = process.env.NEXT_RELEASE_CUT_NUMBER;
 
-// Initialise octokit to call Github GraphQL API
-const octokit = new GitHub(githubToken);
+main().catch((error: Error): void => {
+  console.error(error);
+  process.exit(1);
+});
+
+async function main(): Promise<void> {
+  const githubToken = process.env.GITHUB_TOKEN;
+  if (!githubToken) {
+    core.setFailed('GITHUB_TOKEN not found');
+    process.exit(1);
+  }
+
+  // Initialise octokit to call Github GraphQL API
+  const octokit = getOctokit(githubToken);
+
+  // Get PR info from context
+  const prRepoOwner = context.repo.owner;
+  const prRepoName = context.repo.repo;
+  const prNumber = context.payload.pull_request.number;
+}
+
+// This function creates the release label in case it doesn't exist
+async function createReleaseLabel(): Promise<string> {
+  if (!nextReleaseCutNumber) {
+    // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
+    // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
+    // Example value: 6.5
+    throw new Error("The NEXT_RELEASE_CUT_NUMBER environment variable is not defined.");
+  }
+
+  // Release label needs indicates the next release cut number
+  // Example release label: "release-6.5"
+  const releaseLabelName = `release-{nextReleaseCutNumber}`;
+  const releaseLabelColor = "000000"
+
+  const getLabelQuery = `
+    query GetLabel($prRepoOwner: String!, $prRepoName: String!, $releaseLabelName: String!) {
+      repository(owner: $prRepoOwner, name: $prRepoName) {
+        id
+        label(name: $releaseLabelName) {
+          id
+          name
+        }
+      }
+    }
+  `;
+
+  const createLabelMutation = `
+    mutation CreateLabel($repoId: ID!, $releaseLabelName: String!, $releaseLabelColor: String!) {
+      createLabel(input: {repositoryId: $repoId, name: $releaseLabelName, color: $releaseLabelColor}) {
+        label {
+          id
+          name
+        }
+      }
+    }
+  `;
+
+  const labelResult = await octokit.graphql(getLabelQuery, {
+    prRepoOwner,
+    prRepoName,
+    releaseLabelName,
+  });
+
+  const repoId = labelResult?.repository?.id;
+}
+
+
 
 // Step1: Create release label if it doesn't exist
 
-const nextReleaseCutNumber = process.env.NEXT_RELEASE_CUT_NUMBER;
-if (!nextReleaseCutNumber) {
-  // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
-  // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
-  // Example value: 6.5
-  throw new Error("The NEXT_RELEASE_CUT_NUMBER environment variable is not defined.");
-}
-            
-// Release label needs indicates the next release cut number
-// Example release label: "release-6.5"
-const releaseLabelName = `release-{nextReleaseCutNumber}`;
-const releaseLabelColor = "000000"
 
-const getLabelQuery = `
-  query GetLabel($prRepoOwner: String!, $prRepoName: String!, $releaseLabelName: String!) {
-    repository(owner: $prRepoOwner, name: $prRepoName) {
-      id
-      label(name: $releaseLabelName) {
-        id
-        name
-      }
-    }
-  }
-`;
 
-const createLabelMutation = `
-  mutation CreateLabel($repoId: ID!, $releaseLabelName: String!, $releaseLabelColor: String!) {
-    createLabel(input: {repositoryId: $repoId, name: $releaseLabelName, color: $releaseLabelColor}) {
-      label {
-        id
-        name
-      }
-    }
-  }
-`;
-
-const labelResult = await octokit.graphql(getLabelQuery, {
-  prRepoOwner,
-  prRepoName,
-  releaseLabelName,
-});
-
-const repoId = labelResult?.repository?.id;
 
 let releaseLabelId = labelResult?.repository?.label?.id;
 if (!releaseLabelId) {
