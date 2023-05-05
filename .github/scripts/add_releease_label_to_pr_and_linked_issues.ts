@@ -1,8 +1,6 @@
 import { context, getOctokit } from '@actions/github';
 import { GitHub } from '@actions/github/lib/utils';
 
-const nextReleaseCutNumber = process.env.NEXT_RELEASE_CUT_NUMBER;
-
 main().catch((error: Error): void => {
   console.error(error);
   process.exit(1);
@@ -14,6 +12,20 @@ async function main(): Promise<void> {
     core.setFailed('GITHUB_TOKEN not found');
     process.exit(1);
   }
+  
+  const nextReleaseCutNumber = process.env.NEXT_RELEASE_CUT_NUMBER;
+  if (!nextReleaseCutNumber) {
+    // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
+    // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
+    // Example value: 6.5
+    core.setFailed('NEXT_RELEASE_CUT_NUMBER not found');
+    process.exit(1);
+  }
+  
+  // Release label needs indicates the next release cut number
+  // Example release label: "release-6.5"
+  const releaseLabelName = `release-{nextReleaseCutNumber}`;
+  const releaseLabelColor = "000000"
 
   // Initialise octokit to call Github GraphQL API
   const octokit = getOctokit(githubToken);
@@ -22,33 +34,108 @@ async function main(): Promise<void> {
   const prRepoOwner = context.repo.owner;
   const prRepoName = context.repo.repo;
   const prNumber = context.payload.pull_request.number;
+  
+  
 }
 
-// This function creates the release label in case it doesn't exist
-async function createReleaseLabel(): Promise<string> {
-  if (!nextReleaseCutNumber) {
-    // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
-    // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
-    // Example value: 6.5
-    throw new Error("The NEXT_RELEASE_CUT_NUMBER environment variable is not defined.");
+// This function retrieves the repo
+async function retrieveRepo(octokit, repoOwner: string, repoName: string): Promise<string> {
+  
+  const retrieveRepoQuery = `
+  query RetrieveRepo($repoOwner: String!, $repoName: String!) {
+    repository(owner: $repoOwner, name: $repoName) {
+      id
+    }
   }
+`;
+  
+  const retrieveRepoResult = await octokit.graphql(retrieveRepoQuery, {
+    repoOwner,
+    repoName,
+    labelName,
+  });
 
-  // Release label needs indicates the next release cut number
-  // Example release label: "release-6.5"
-  const releaseLabelName = `release-{nextReleaseCutNumber}`;
-  const releaseLabelColor = "000000"
+  const repoId = retrieveRepoResult?.repository?.id;
 
-  const getLabelQuery = `
-    query GetLabel($prRepoOwner: String!, $prRepoName: String!, $releaseLabelName: String!) {
-      repository(owner: $prRepoOwner, name: $prRepoName) {
-        id
-        label(name: $releaseLabelName) {
+  return repoId;
+}
+
+// This function retrieves the label on a specific repo
+async function retrieveLabel(octokit, repoOwner: string, repoName: string, labelName: string): Promise<string> {
+  
+  const retrieveLabelQuery = `
+    query RetrieveLabel($repoOwner: String!, $repoName: String!, $labelName: String!) {
+      repository(owner: $repoOwner, name: $repoName) {
+        label(name: $labelName) {
           id
-          name
         }
       }
     }
   `;
+  
+  const retrieveLabelResult = await octokit.graphql(retrieveLabelQuery, {
+    repoOwner,
+    repoName,
+    labelName,
+  });
+
+  const labelId = retrieveLabelResult?.repository?.label?.id;
+
+  return labelId;
+}
+
+// This function creates the label on a specific repo
+async function createLabel(octokit, repoId: string, labelName: string, labelColor: string): Promise<string> {
+  
+  const createLabelMutation = `
+    mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!) {
+      createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor}) {
+        label {
+          id
+        }
+      }
+    }
+  `;
+  
+  const createLabelResult = await octokit.graphql(createLabelMutation, {
+    repoId,
+    labelName,
+    labelColor,
+  });
+
+  const labelId = createLabelResult?.createLabel?.label?.id;
+
+  if (!releaseLabelId) {
+    throw new Error("Shall never happen: labelId not defined for created label");
+  }
+  
+  return labelId;
+}
+
+// This function creates or retrieves the label on a repo
+async function createOrRetrieveLabel(octokit, repoOwner: string, repoName: string, labelName: string, labelColor: string): Promise<string> {
+  
+  // Check if label already exists on repo
+  let labelId = await retrieveLabel(octokit, repoOwner, repoName, labelName);
+
+  // If label doesn't exist on repo, create it
+  if (!labelId) {
+    // Retrieve PR's repo
+    const repoId = await retrieveRepo(octokit, repoOwner, repoName);
+    
+    // Create label on repo
+    labelId = await createLabel(octokit, repoId, labelName, labelColor);
+  }
+  
+  return labelId;
+}
+
+
+
+
+
+// Step1: Create release label if it doesn't exist
+
 
   const createLabelMutation = `
     mutation CreateLabel($repoId: ID!, $releaseLabelName: String!, $releaseLabelColor: String!) {
@@ -60,22 +147,6 @@ async function createReleaseLabel(): Promise<string> {
       }
     }
   `;
-
-  const labelResult = await octokit.graphql(getLabelQuery, {
-    prRepoOwner,
-    prRepoName,
-    releaseLabelName,
-  });
-
-  const repoId = labelResult?.repository?.id;
-}
-
-
-
-// Step1: Create release label if it doesn't exist
-
-
-
 
 let releaseLabelId = labelResult?.repository?.label?.id;
 if (!releaseLabelId) {
