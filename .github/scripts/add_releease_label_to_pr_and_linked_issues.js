@@ -1,5 +1,4 @@
-const { Octokit } = require("@octokit/core");
-const { graphql } = require("@octokit/graphql");
+const { GitHub, context } = require("@actions/github");
 
 const githubToken = process.env.GITHUB_TOKEN;
 const prNumber = process.env.PR_NUMBER;
@@ -8,18 +7,7 @@ const prRepoOwner = prRepo.split('/')[0];
 const prRepoName = prRepo.split('/')[1];
 
 // Initialise octokit to call Github GraphQL API
-const octokit = new Octokit({ auth: githubToken });
-const octokit = new Octokit({
-  auth: `token ${process.env.GITHUB_TOKEN}`,
-  userAgent: "Github action to add release label to PR linked issues",
-});
-
-octokit.graphql = graphql.defaults({
-  headers: {
-    authorization: `token ${process.env.GITHUB_TOKEN}`,
-  },
-});
-
+const octokit = new GitHub(githubToken);
 
 // Step1: Create release label if it doesn't exist
 
