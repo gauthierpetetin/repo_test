@@ -1,6 +1,15 @@
 import { context, getOctokit } from '@actions/github';
 import { GitHub } from '@actions/github/lib/utils';
 
+// A labelable object can be a pull request or an issue
+interface Labelable {
+  id: string;
+  number: number;
+  repoOwner: string;
+  repoName: string;
+  createdAt: string;
+}
+
 main().catch((error: Error): void => {
   console.error(error);
   process.exit(1);
@@ -30,12 +39,24 @@ async function main(): Promise<void> {
   // Initialise octokit to call Github GraphQL API
   const octokit = getOctokit(githubToken);
 
-  // Get PR info from context
+  // Retrieve pull request info from context
   const prRepoOwner = context.repo.owner;
   const prRepoName = context.repo.repo;
   const prNumber = context.payload.pull_request.number;
   
+  // Retrieve pull request
+  const pullRequest: Labelable = await retrievePullRequest(octokit, prRepoOwner, prRepoName, prNumber);
   
+  // Add the release label to the pull request
+  await addLabelToLabelable(octokit, pullRequest, releaseLabelName, releaseLabelColor);
+  
+  // Retrieve linked issues for the pull request
+  const linkedIssues: Labelable[] = await retrieveLinkedIssues(octokit, prRepoOwner, prRepoName, prNumber);
+  
+  // Add the release label to the linked issues
+  for (const linkedIssue of linkedIssues) {
+    await addLabelToLabelable(octokit, linkedIssue, releaseLabelName, releaseLabelColor);
+  }
 }
 
 // This function retrieves the repo
@@ -127,13 +148,14 @@ async function createOrRetrieveLabel(octokit, repoOwner: string, repoName: strin
 }
 
 // This function retrieves the pull request on a specific repo
-async function retrievePullRequest(octokit, repoOwner: string, repoName: string, prNumber: string): Promise<string> {
+async function retrievePullRequest(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable> {
   
   const retrievePullRequestQuery = `
-    query GetPullRequestId($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
+    query GetPullRequest($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
       repository(owner: $repoOwner, name: $repoName) {
         pullRequest(number: $prNumber) {
           id
+          createdAt
         }
       }
     }
@@ -145,13 +167,19 @@ async function retrievePullRequest(octokit, repoOwner: string, repoName: string,
     prNumber,
   });
 
-  const prId = retrievePullRequestResult?.repository?.pullRequest?.id;
+  const pullRequest: Labelable = {
+    id: retrievePullRequestResult?.repository?.pullRequest?.id,
+    number: prNumber,
+    repoOwner: repoOwner,
+    repoName: repoName,
+    createdAt: retrievePullRequestResult?.repository?.pullRequest?.createdAt,
+  }
   
-  return prId;
+  return pullRequest;
 }
 
-// This function retrieves the timeline event of a pull request
-async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: string, prNumber: string): Promise<string> {
+// This function retrieves the timeline event for a pull request
+async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<any[]> {
   
   // We assume there won't be more than 100 timeline events
   const retrieveTimelineEventsQuery = `
@@ -209,45 +237,35 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
     prNumber,
   });
 
+  const timelineEvents = result?.data?.repository?.pullRequest?.timelineItems?.nodes;
   
-  return xxx;
+  return timelineEvents;
 }
 
-
-
-// Step2: Fetch PR's id (required for GraphQL queries)
-
-
-
-// Fetch PR's list of linked issues (deduced from timeline events)
-
-
-(async () => {
-  // Fetch PR's list of linked issues (deduced from timeline events)
- 
+// This function retrieves the list of linked issues for a pull request
+async function retrieveLinkedIssues(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable[]> {
   
-  const timelineItems = result?.data?.repository?.pullRequest?.timelineItems?.nodes;
+  // The list of linked issues can be deduced from timeline events
+  const timelineEvents = await retrieveTimelineEvents(octokit, repoOwner, repoName, prNumber);
+  
+  const linkedIssuesMap: Record<string, Labelable> = {};
 
-  // Use the PR's timeline events to deduce the linked issues
-  // This is not straightforward, but there's currently no easier way to obtain linked issues thanks to Github APIs)
-  const linkedIssuesMap = {};
+  // This way to retrieve linked issues is not straightforward, but there's currently no easier way to obtain linked issues thanks to Github APIs
+  timelineEvents?.forEach((event) => {
+    const issue = event.subject;
 
-  timelineItems?.forEach((item) => {
-    const issue = item.subject;
-
-    if (item.__typename === 'ConnectedEvent') {
+    if (event?.__typename === 'ConnectedEvent') {
       linkedIssuesMap[issue.id] = {
         id: issue.id,
-        number: issue.number,
-        owner: issue.repository.owner.login,
-        repo: issue.repository.name,
-        createdAt: item.createdAt,
-        url: issue.url // Not sure we need this
+        number: issue?.number,
+        repoOwner: issue?.repository?.owner?.login,
+        repoName: issue?.repository?.name,
+        createdAt: event?.createdAt,
       };
-    } else if (item.__typename === 'DisconnectedEvent') {
+    } else if (event?.__typename === 'DisconnectedEvent') {
       const linkedIssue = linkedIssuesMap[issue.id];
 
-      if (linkedIssue && new Date(item.createdAt) > new Date(linkedIssue.createdAt)) {
+      if (linkedIssue && new Date(event?.createdAt) > new Date(linkedIssue?.createdAt)) {
         delete linkedIssuesMap[issue.id];
       }
     }
@@ -255,30 +273,26 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
 
   const linkedIssues = Object.values(linkedIssuesMap);
   
-  // Add release label to PR and connected issues using GraphQL mutations
-  const addLabelMutation = `
-    mutation addLabelsToLabelable($labelableId: ID!, $labelIds: [ID!]!) {
-      addLabelsToLabelable(input: {labelableId: $labelableId, labelIds: $labelIds}) {
+  return linkedIssues;
+}
+
+// This function adds label to a labelable object (i.e. a pull request or an issue)
+async function addLabelToLabelable(octokit, labelable: Labelable, labelName: string, labelColor: string): Promise<void> {
+  
+  // Retrieve label from the labelable's repo, or create label if required
+  const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor);
+
+  const addLabelToLabelableMutation = `
+    mutation addLabelToLabelable($labelableId: ID!, $labelIds: [ID!]!) {
+      addLabelToLabelable(input: {labelableId: $labelableId, labelIds: $labelIds}) {
         clientMutationId
       }
     }
   `;
   
-  // Add the release label to the PR
-  await octokit.graphql(addLabelMutation, {
-    labelableId: prId,
-    labelIds: [releaseLabelId],
+  await octokit.graphql(addLabelToLabelableMutation, {
+    labelableId: labelable?.id,
+    labelIds: [labelId],
   });
-                          
-  // Add the release label to the linked issues
-  for (const issue of linkedIssues) {
-    await octokit.graphql(addLabelMutation, {
-      labelableId: issue.id,
-      labelIds: [releaseLabelId],
-    });
-  }
-    
-})().catch((error) => {
-  console.error("Error:", error);
-  process.exit(1);
-});
+  
+}
