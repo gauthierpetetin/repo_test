@@ -25,7 +25,5 @@ jobs:
         id: add_releease_label_to_pr_and_linked_issues
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_REPO: ${{ github.repository }}
           NEXT_RELEASE_CUT_NUMBER: ${{ env.NEXT_RELEASE_CUT_NUMBER }}
         run: node .github/scripts/add_releease_label_to_pr_and_linked_issues.js
