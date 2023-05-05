@@ -104,10 +104,6 @@ async function createLabel(octokit, repoId: string, labelName: string, labelColo
   });
 
   const labelId = createLabelResult?.createLabel?.label?.id;
-
-  if (!releaseLabelId) {
-    throw new Error("Shall never happen: labelId not defined for created label");
-  }
   
   return labelId;
 }
@@ -130,145 +126,105 @@ async function createOrRetrieveLabel(octokit, repoOwner: string, repoName: strin
   return labelId;
 }
 
-
-
-
-
-// Step1: Create release label if it doesn't exist
-
-
-  const createLabelMutation = `
-    mutation CreateLabel($repoId: ID!, $releaseLabelName: String!, $releaseLabelColor: String!) {
-      createLabel(input: {repositoryId: $repoId, name: $releaseLabelName, color: $releaseLabelColor}) {
-        label {
+// This function retrieves the pull request on a specific repo
+async function retrievePullRequest(octokit, repoOwner: string, repoName: string, prNumber: string): Promise<string> {
+  
+  const retrievePullRequestQuery = `
+    query GetPullRequestId($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
+      repository(owner: $repoOwner, name: $repoName) {
+        pullRequest(number: $prNumber) {
           id
-          name
         }
       }
     }
   `;
 
-let releaseLabelId = labelResult?.repository?.label?.id;
-if (!releaseLabelId) {
-  const createLabelResult = await octokit.graphql(createLabelMutation, {
-    repoId,
-    releaseLabelName,
-    releaseLabelColor,
+  const retrievePullRequestResult = await octokit.graphql(retrievePullRequestQuery, {
+    repoOwner,
+    repoName,
+    prNumber,
   });
-  releaseLabelId = createLabelResult?.createLabel?.label?.id;
+
+  const prId = retrievePullRequestResult?.repository?.pullRequest?.id;
+  
+  return prId;
 }
 
-if (!releaseLabelId) {
-  throw new Error("Shall never happen: release label is not defined.");
+// This function retrieves the timeline event of a pull request
+async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: string, prNumber: string): Promise<string> {
+  
+  // We assume there won't be more than 100 timeline events
+  const retrieveTimelineEventsQuery = `
+    query($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
+      repository(owner: $repoOwner, name: $repoName) {
+        pullRequest(number: $prNumber) {
+          timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 100) {
+            nodes {
+              ... on ConnectedEvent {
+                __typename
+                createdAt
+                subject {
+                  ... on Issue {
+                    number
+                    title
+                    id
+                    url
+                    repository {
+                      name
+                      owner {
+                        login
+                      }
+                    }
+                  }
+                }
+              }
+              ... on DisconnectedEvent {
+                __typename
+                createdAt
+                subject {
+                  ... on Issue {
+                    number
+                    title
+                    id
+                    url
+                    repository {
+                      name
+                      owner {
+                        login
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  
+  const retrieveTimelineEventsResult = await octokit.graphql(retrieveTimelineEventsQuery, {
+    repoOwner,
+    repoName,
+    prNumber,
+  });
+
+  
+  return xxx;
 }
+
 
 
 // Step2: Fetch PR's id (required for GraphQL queries)
 
-const getPullRequestIdQuery = `
-  query GetPullRequestId($prRepoOwner: String!, $prRepoName: String!, $prNumber: Int!) {
-    repository(owner: $prRepoOwner, name: $prRepoName) {
-      pullRequest(number: $prNumber) {
-        id
-      }
-    }
-  }
-`;
 
-const pullRequestIdResult = await octokit.graphql(getPullRequestIdQuery, {
-  prRepoOwner,
-  prRepoName,
-  prNumber,
-});
-
-const prId = pullRequestIdResult?.repository?.pullRequest?.id;
 
 // Fetch PR's list of linked issues (deduced from timeline events)
-const QUERY = `
-  query($releaseLabelName: String!, $prRepoOwner: String!, $prRepoName: String!, $prNumber: Int!) {
-    repository(owner: $prRepoOwner, name: $prRepoName) {
-      label(name: $releaseLabelName) {
-        id
-      }
-      pullRequest(number: $prNumber) {
-        timelineItems(itemTypes: [CONNECTED_EVENT, DISCONNECTED_EVENT], first: 100) {
-          nodes {
-            ... on ConnectedEvent {
-              __typename
-              createdAt
-              subject {
-                ... on Issue {
-                  number
-                  title
-                  id
-                  url
-                  repository {
-                    name
-                    owner {
-                      login
-                    }
-                  }
-                }
-              }
-            }
-            ... on DisconnectedEvent {
-              __typename
-              createdAt
-              subject {
-                ... on Issue {
-                  number
-                  title
-                  id
-                  url
-                  repository {
-                    name
-                    owner {
-                      login
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+
 
 (async () => {
   // Fetch PR's list of linked issues (deduced from timeline events)
-  const result = await graphql(QUERY, {
-    releaseLabelName,
-    prRepoOwner,
-    prRepoName,
-    prNumber,
-    headers: {
-      authorization: `token ${githubToken}`,
-    },
-  });
-  
-  // In case release label doesn't exist, it needs to be created
-  let releaseLabelId = result?.data?.repository?.label?.id;
-  if(!releaseLabelId) {
-    const createLabelMutation = `
-      mutation CreateLabel($repoId: ID!, $name: String!, $color: String!) {
-        createLabel(input: {repositoryId: $repoId, name: $name, color: $color}) {
-          label {
-            id
-            name
-          }
-        }
-      }
-    `;
-    
-    const createLabelResult = await octokit.graphql(createLabelMutation, {
-      repoId,
-      name: releaseLabelName,
-      color: labelColor,
-    });
-    labelId = createLabelResult.createLabel.label.id;
-  }
+ 
   
   const timelineItems = result?.data?.repository?.pullRequest?.timelineItems?.nodes;
 
