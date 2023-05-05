@@ -10,10 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 16
+
+      - name: Install dependencies
+        run: npm install
           
       - name: Add release label to PR and linked issues
         id: add_releease_label_to_pr_and_linked_issues
