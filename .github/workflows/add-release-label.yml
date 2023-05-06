@@ -11,15 +11,18 @@ jobs:
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: '16'
 
+      - name: Install Yarn
+        run: npm install -g yarn
+    
       - name: Install dependencies
-        run: npm install
+        run: yarn
           
       - name: Add release label to PR and linked issues
         id: add_releease_label_to_pr_and_linked_issues
