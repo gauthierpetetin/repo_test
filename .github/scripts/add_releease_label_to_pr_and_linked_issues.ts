@@ -19,7 +19,8 @@ async function main(): Promise<void> {
   // "GITHUB_TOKEN" is an automatically generated, repository-specific access token provided by GitHub Actions.
   // We can't use "GITHUB_TOKEN" here, as its permissions are scoped to the repository where the action is running.
   // "GITHUB_TOKEN" does not have access to other repositories, even if they belong to the same organization.
-  // As a consequence, we need to create our own "PERSONAL_ACCESS_TOKEN" with access to other repositories of the MetaMask organisation.
+  // As we want to update linked issues which are not necessarily located in the same repository,
+  // we need to create our own "PERSONAL_ACCESS_TOKEN" with access to other repositories of the MetaMask organisation.
   const personalAccessToken = process.env.PERSONAL_ACCESS_TOKEN;
   if (!personalAccessToken) {
     core.setFailed('PERSONAL_ACCESS_TOKEN not found');
@@ -35,12 +36,12 @@ async function main(): Promise<void> {
     process.exit(1);
   }
   
-  // Release label needs indicates the next release cut number
+  // Release label indicates the next release cut number
   // Example release label: "release-6.5"
-  const releaseLabelName = `release-{nextReleaseCutNumber}`;
+  const releaseLabelName = `release-${nextReleaseCutNumber}`;
   const releaseLabelColor = "000000"
 
-  // Initialise octokit to call Github GraphQL API
+  // Initialise octokit, required to call Github GraphQL API
   const octokit = getOctokit(personalAccessToken);
 
   // Retrieve pull request info from context
@@ -132,13 +133,13 @@ async function createLabel(octokit, repoId: string, labelName: string, labelColo
   return labelId;
 }
 
-// This function creates or retrieves the label on a repo
+// This function creates or retrieves the label on a specific repo
 async function createOrRetrieveLabel(octokit, repoOwner: string, repoName: string, labelName: string, labelColor: string): Promise<string> {
   
-  // Check if label already exists on repo
+  // Check if label already exists on the repo
   let labelId = await retrieveLabel(octokit, repoOwner, repoName, labelName);
 
-  // If label doesn't exist on repo, create it
+  // If label doesn't exist on the repo, create it
   if (!labelId) {
     // Retrieve PR's repo
     const repoId = await retrieveRepo(octokit, repoOwner, repoName);
@@ -181,7 +182,7 @@ async function retrievePullRequest(octokit, repoOwner: string, repoName: string,
   return pullRequest;
 }
 
-// This function retrieves the timeline event for a pull request
+// This function retrieves the timeline events for a pull request
 async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<any[]> {
   
   // We assume there won't be more than 100 timeline events
@@ -197,9 +198,7 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
                 subject {
                   ... on Issue {
                     number
-                    title
                     id
-                    url
                     repository {
                       name
                       owner {
@@ -215,9 +214,7 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
                 subject {
                   ... on Issue {
                     number
-                    title
                     id
-                    url
                     repository {
                       name
                       owner {
