@@ -16,9 +16,13 @@ main().catch((error: Error): void => {
 });
 
 async function main(): Promise<void> {
-  const githubToken = process.env.GITHUB_TOKEN;
-  if (!githubToken) {
-    core.setFailed('GITHUB_TOKEN not found');
+  // "GITHUB_TOKEN" is an automatically generated, repository-specific access token provided by GitHub Actions.
+  // We can't use "GITHUB_TOKEN" here, as its permissions are scoped to the repository where the action is running.
+  // "GITHUB_TOKEN" does not have access to other repositories, even if they belong to the same organization.
+  // As a consequence, we need to create our own "PERSONAL_ACCESS_TOKEN" with access to other repositories of the MetaMask organisation.
+  const personalAccessToken = process.env.PERSONAL_ACCESS_TOKEN;
+  if (!personalAccessToken) {
+    core.setFailed('PERSONAL_ACCESS_TOKEN not found');
     process.exit(1);
   }
   
@@ -37,7 +41,7 @@ async function main(): Promise<void> {
   const releaseLabelColor = "000000"
 
   // Initialise octokit to call Github GraphQL API
-  const octokit = getOctokit(githubToken);
+  const octokit = getOctokit(personalAccessToken);
 
   // Retrieve pull request info from context
   const prRepoOwner = context.repo.owner;
