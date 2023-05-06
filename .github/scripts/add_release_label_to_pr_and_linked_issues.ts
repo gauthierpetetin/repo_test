@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { context, getOctokit } from '@actions/github';
+import { context, getOctokit, GitHub } from '@actions/github';
 
 // A labelable object can be a pull request or an issue
 interface Labelable {
