@@ -1,7 +1,12 @@
 {
   "name": "my-test-repo",
   "version": "1.0.0",
+  "scripts": {
+    "add_release_label_to_pr_and_linked_issues": "ts-node ./.github/scripts/add_release_label_to_pr_and_linked_issues.ts"
+  },
   "devDependencies": {
+    "typescript": "~4.4.0",
+    "ts-node": "^10.5.0",
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1"
   }
