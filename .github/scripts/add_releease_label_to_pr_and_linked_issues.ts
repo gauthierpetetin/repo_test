@@ -237,7 +237,7 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
     prNumber,
   });
 
-  const timelineEvents = retrieveTimelineEventsResult?.data?.repository?.pullRequest?.timelineItems?.nodes;
+  const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes;
   
   return timelineEvents;
 }
