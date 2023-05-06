@@ -1,5 +1,5 @@
+import * as core from '@actions/core';
 import { context, getOctokit } from '@actions/github';
-import { GitHub } from '@actions/github/lib/utils';
 
 // A labelable object can be a pull request or an issue
 interface Labelable {
@@ -77,7 +77,6 @@ async function retrieveRepo(octokit, repoOwner: string, repoName: string): Promi
   const retrieveRepoResult = await octokit.graphql(retrieveRepoQuery, {
     repoOwner,
     repoName,
-    labelName,
   });
 
   const repoId = retrieveRepoResult?.repository?.id;
@@ -241,7 +240,7 @@ async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: stri
     prNumber,
   });
 
-  const timelineEvents = result?.data?.repository?.pullRequest?.timelineItems?.nodes;
+  const timelineEvents = retrieveTimelineEventsResult?.data?.repository?.pullRequest?.timelineItems?.nodes;
   
   return timelineEvents;
 }
