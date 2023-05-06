@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { context, getOctokit, Octokit } from '@actions/github';
+import { context, getOctokit } from '@actions/github';
 
 // A labelable object can be a pull request or an issue
 interface Labelable {
@@ -42,7 +42,7 @@ async function main(): Promise<void> {
   const releaseLabelColor = "000000"
 
   // Initialise octokit, required to call Github GraphQL API
-  const octokit: Octokit = getOctokit(personalAccessToken);
+  const octokit = getOctokit(personalAccessToken);
 
   // Retrieve pull request info from context
   const prRepoOwner = context.repo.owner;
@@ -65,7 +65,7 @@ async function main(): Promise<void> {
 }
 
 // This function retrieves the repo
-async function retrieveRepo(octokit: Octokit, repoOwner: string, repoName: string): Promise<string> {
+async function retrieveRepo(octokit, repoOwner: string, repoName: string): Promise<string> {
   
   const retrieveRepoQuery = `
   query RetrieveRepo($repoOwner: String!, $repoName: String!) {
@@ -86,7 +86,7 @@ async function retrieveRepo(octokit: Octokit, repoOwner: string, repoName: strin
 }
 
 // This function retrieves the label on a specific repo
-async function retrieveLabel(octokit: Octokit, repoOwner: string, repoName: string, labelName: string): Promise<string> {
+async function retrieveLabel(octokit, repoOwner: string, repoName: string, labelName: string): Promise<string> {
   
   const retrieveLabelQuery = `
     query RetrieveLabel($repoOwner: String!, $repoName: String!, $labelName: String!) {
@@ -110,7 +110,7 @@ async function retrieveLabel(octokit: Octokit, repoOwner: string, repoName: stri
 }
 
 // This function creates the label on a specific repo
-async function createLabel(octokit: Octokit, repoId: string, labelName: string, labelColor: string): Promise<string> {
+async function createLabel(octokit, repoId: string, labelName: string, labelColor: string): Promise<string> {
   
   const createLabelMutation = `
     mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!) {
@@ -134,7 +134,7 @@ async function createLabel(octokit: Octokit, repoId: string, labelName: string, 
 }
 
 // This function creates or retrieves the label on a specific repo
-async function createOrRetrieveLabel(octokit: Octokit, repoOwner: string, repoName: string, labelName: string, labelColor: string): Promise<string> {
+async function createOrRetrieveLabel(octokit, repoOwner: string, repoName: string, labelName: string, labelColor: string): Promise<string> {
   
   // Check if label already exists on the repo
   let labelId = await retrieveLabel(octokit, repoOwner, repoName, labelName);
@@ -152,7 +152,7 @@ async function createOrRetrieveLabel(octokit: Octokit, repoOwner: string, repoNa
 }
 
 // This function retrieves the pull request on a specific repo
-async function retrievePullRequest(octokit: Octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable> {
+async function retrievePullRequest(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable> {
   
   const retrievePullRequestQuery = `
     query GetPullRequest($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
@@ -183,7 +183,7 @@ async function retrievePullRequest(octokit: Octokit, repoOwner: string, repoName
 }
 
 // This function retrieves the timeline events for a pull request
-async function retrieveTimelineEvents(octokit: Octokit, repoOwner: string, repoName: string, prNumber: number): Promise<any[]> {
+async function retrieveTimelineEvents(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<any[]> {
   
   // We assume there won't be more than 100 timeline events
   const retrieveTimelineEventsQuery = `
@@ -243,7 +243,7 @@ async function retrieveTimelineEvents(octokit: Octokit, repoOwner: string, repoN
 }
 
 // This function retrieves the list of linked issues for a pull request
-async function retrieveLinkedIssues(octokit: Octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable[]> {
+async function retrieveLinkedIssues(octokit, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable[]> {
   
   // The list of linked issues can be deduced from timeline events
   const timelineEvents = await retrieveTimelineEvents(octokit, repoOwner, repoName, prNumber);
@@ -277,7 +277,7 @@ async function retrieveLinkedIssues(octokit: Octokit, repoOwner: string, repoNam
 }
 
 // This function adds label to a labelable object (i.e. a pull request or an issue)
-async function addLabelToLabelable(octokit: Octokit, labelable: Labelable, labelName: string, labelColor: string): Promise<void> {
+async function addLabelToLabelable(octokit, labelable: Labelable, labelName: string, labelColor: string): Promise<void> {
   
   // Retrieve label from the labelable's repo, or create label if required
   const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor);
