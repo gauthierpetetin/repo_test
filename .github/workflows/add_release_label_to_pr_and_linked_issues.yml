@@ -29,4 +29,4 @@ jobs:
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           NEXT_RELEASE_CUT_NUMBER: ${{ env.NEXT_RELEASE_CUT_NUMBER }}
-        run: node .github/scripts/add_release_label_to_pr_and_linked_issues.js
+        run: node .github/scripts/add_release_label_to_pr_and_linked_issues.ts
