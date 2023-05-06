@@ -1,5 +1,5 @@
 {
-  "name": "My test repo",
+  "name": "my-test-repo",
   "version": "1.0.0",
   "devDependencies": {
     "@actions/core": "^1.10.0",
