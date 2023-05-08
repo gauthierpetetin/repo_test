@@ -44,11 +44,7 @@ async function main(): Promise<void> {
   const releaseLabelDescription = `Issue or pull request that will be included in release ${nextReleaseCutNumber}`;
 
   // Initialise octokit, required to call Github GraphQL API
-  const octokit: InstanceType<typeof GitHub> = getOctokit(personalAccessToken, {
-    headers: {
-      Accept: "application/vnd.github.bane-preview+json", // Headers are required to access the "previews" feature of Github API, like "createLabel".
-    },
-  });
+  const octokit: InstanceType<typeof GitHub> = getOctokit(personalAccessToken);
 
   // Retrieve pull request info from context
   const prRepoOwner = context.repo.owner;
@@ -148,12 +144,20 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
         id: string;
       };
     };
-  } = await octokit.graphql(createLabelMutation, {
-    repoId,
-    labelName,
-    labelColor,
-    labelDescription,
-  });
+  } = await octokit.graphql(
+    createLabelMutation,
+    {
+      repoId,
+      labelName,
+      labelColor,
+      labelDescription,
+    },
+    {
+      headers: {
+        Accept: "application/vnd.github.bane-preview+json", // Headers are required to access the "previews" feature of Github API, like "createLabel".
+      },
+    }
+  );
 
   const labelId = createLabelResult?.createLabel?.label?.id;
   
@@ -346,9 +350,17 @@ async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelab
     }
   `;
   
-  await octokit.graphql(addLabelsToLabelableMutation, {
-    labelableId: labelable?.id,
-    labelIds: [labelId],
-  });
+  await octokit.graphql(
+    addLabelsToLabelableMutation,
+    {
+      labelableId: labelable?.id,
+      labelIds: [labelId],
+    },
+    {
+      headers: {
+        Accept: "application/vnd.github.bane-preview+json", // Headers are required to access the "previews" feature of Github API, like "addLabelsToLabelable".
+      },
+    }
+  );
   
 }
