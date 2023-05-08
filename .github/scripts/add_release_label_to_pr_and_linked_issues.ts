@@ -63,14 +63,14 @@ async function main(): Promise<void> {
   const pullRequest: Labelable = await retrievePullRequest(octokit, prRepoOwner, prRepoName, prNumber);
   
   // Add the release label to the pull request
-  await addLabelToLabelable(octokit, pullRequest, releaseLabelName, releaseLabelColor);
+  await addLabelToLabelable(octokit, pullRequest, releaseLabelName, releaseLabelColor, releaseLabelDescription);
   
   // Retrieve linked issues for the pull request
   const linkedIssues: Labelable[] = await retrieveLinkedIssues(octokit, prRepoOwner, prRepoName, prNumber);
   
   // Add the release label to the linked issues
   for (const linkedIssue of linkedIssues) {
-    await addLabelToLabelable(octokit, linkedIssue, releaseLabelName, releaseLabelColor);
+    await addLabelToLabelable(octokit, linkedIssue, releaseLabelName, releaseLabelColor, releaseLabelDescription);
   }
 }
 
