@@ -133,8 +133,8 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
 async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string, labelName: string, labelColor: string, labelDescription: string): Promise<string> {
   
   const createLabelMutation = `
-    mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!) {
-      createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor}) {
+    mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!, $labelDescription: String) {
+      createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor, description: $labelDescription}) {
         label {
           id
         }
