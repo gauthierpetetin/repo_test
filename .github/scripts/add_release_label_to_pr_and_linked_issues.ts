@@ -40,7 +40,8 @@ async function main(): Promise<void> {
   // Release label indicates the next release cut number
   // Example release label: "release-6.5"
   const releaseLabelName = `release-${nextReleaseCutNumber}`;
-  const releaseLabelColor = "000000"
+  const releaseLabelColor = "000000";
+  const releaseLabelDescription = `Issue or pull request that will be included in release ${nextReleaseCutNumber}`;
 
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(personalAccessToken, {
@@ -129,11 +130,11 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
 }
 
 // This function creates the label on a specific repo
-async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string, labelName: string, labelColor: string): Promise<string> {
+async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string, labelName: string, labelColor: string, labelDescription: string): Promise<string> {
   
   const createLabelMutation = `
-    mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!) {
-      createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor}) {
+    mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!, $labelDescription: String!) {
+      createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor, description: $labelDescription}) {
         label {
           id
         }
@@ -151,6 +152,7 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
     repoId,
     labelName,
     labelColor,
+    labelDescription,
   });
 
   const labelId = createLabelResult?.createLabel?.label?.id;
@@ -159,7 +161,7 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
 }
 
 // This function creates or retrieves the label on a specific repo
-async function createOrRetrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, labelName: string, labelColor: string): Promise<string> {
+async function createOrRetrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, labelName: string, labelColor: string, labelDescription: string): Promise<string> {
   
   // Check if label already exists on the repo
   let labelId = await retrieveLabel(octokit, repoOwner, repoName, labelName);
@@ -170,7 +172,7 @@ async function createOrRetrieveLabel(octokit: InstanceType<typeof GitHub>, repoO
     const repoId = await retrieveRepo(octokit, repoOwner, repoName);
     
     // Create label on repo
-    labelId = await createLabel(octokit, repoId, labelName, labelColor);
+    labelId = await createLabel(octokit, repoId, labelName, labelColor, labelDescription);
   }
   
   return labelId;
@@ -331,10 +333,10 @@ async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOw
 }
 
 // This function adds label to a labelable object (i.e. a pull request or an issue)
-async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelable: Labelable, labelName: string, labelColor: string): Promise<void> {
+async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelable: Labelable, labelName: string, labelColor: string, labelDescription: string): Promise<void> {
   
   // Retrieve label from the labelable's repo, or create label if required
-  const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor);
+  const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor, labelDescription);
 
   const addLabelsToLabelableMutation = `
     mutation AddLabelsToLabelable($labelableId: ID!, $labelIds: [ID!]!) {
