@@ -236,7 +236,22 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
     }
   `;
   
-  const retrieveTimelineEventsResult = await octokit.graphql(retrieveTimelineEventsQuery, {
+  const retrieveTimelineEventsResult: {
+    repository: {
+      pullRequest: {
+        id: string;
+        timelineItems: {
+          nodes: Array<{
+            __typename: string;
+            id: string;
+            target: {
+              oid: string;
+            };
+          }>;
+        };
+      };
+    };
+  } = await octokit.graphql(retrieveTimelineEventsQuery, {
     repoOwner,
     repoName,
     prNumber,
