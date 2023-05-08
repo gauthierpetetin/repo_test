@@ -89,7 +89,7 @@ async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: str
     repoName,
   });
 
-  const repoId = retrieveRepoResult?.repository?.id as string;
+  const repoId = retrieveRepoResult?.repository?.id;
 
   return repoId;
 }
@@ -119,7 +119,7 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
     labelName,
   });
 
-  const labelId = retrieveLabelResult?.repository?.label?.id as string;
+  const labelId = retrieveLabelResult?.repository?.label?.id;
 
   return labelId;
 }
@@ -149,7 +149,7 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
     labelColor,
   });
 
-  const labelId = createLabelResult?.createLabel?.label?.id as string;
+  const labelId = createLabelResult?.createLabel?.label?.id;
   
   return labelId;
 }
@@ -190,12 +190,7 @@ async function retrievePullRequest(octokit: InstanceType<typeof GitHub>, repoOwn
     repository: {
       pullRequest: {
         id: string;
-        labels: {
-          nodes: Array<{
-            id: string;
-            name: string;
-          }>;
-        };
+        createdAt: string;
       };
     };
   } = await octokit.graphql(retrievePullRequestQuery, {
@@ -267,13 +262,19 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
   const retrieveTimelineEventsResult: {
     repository: {
       pullRequest: {
-        id: string;
         timelineItems: {
           nodes: Array<{
-            __typename: string;
-            id: string;
-            target: {
-              oid: string;
+            __typename: 'ConnectedEvent' | 'DisconnectedEvent';
+            createdAt: string;
+            subject: {
+              number: number;
+              id: string;
+              repository: {
+                name: string;
+                owner: {
+                  login: string;
+                };
+              };
             };
           }>;
         };
@@ -285,7 +286,7 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
     prNumber,
   });
 
-  const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes as Array<Record<string, any>>;
+  const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes;
   
   return timelineEvents;
 }
@@ -300,7 +301,7 @@ async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOw
 
   // This way to retrieve linked issues is not straightforward, but there's currently no easier way to obtain linked issues thanks to Github APIs
   timelineEvents?.forEach((event) => {
-    const issue = event.subject as Record<string, any>;
+    const issue = event.subject;
 
 
     if (event?.__typename === 'ConnectedEvent') {
