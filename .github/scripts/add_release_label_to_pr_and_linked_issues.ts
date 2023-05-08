@@ -46,7 +46,7 @@ async function main(): Promise<void> {
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(personalAccessToken, {
     headers: {
-      accept: "application/vnd.github.bane-preview+json", // Headers are required to access the "previews" feature of Github API, like "createLabel".
+      Accept: "application/vnd.github.bane-preview+json", // Headers are required to access the "previews" feature of Github API, like "createLabel".
     },
   });
 
