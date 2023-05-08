@@ -85,7 +85,7 @@ async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: str
     repoName,
   });
 
-  const repoId = retrieveRepoResult?.repository?.id;
+  const repoId = retrieveRepoResult?.repository?.id as string;
 
   return repoId;
 }
@@ -109,7 +109,7 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
     labelName,
   });
 
-  const labelId = retrieveLabelResult?.repository?.label?.id;
+  const labelId = retrieveLabelResult?.repository?.label?.id as string;
 
   return labelId;
 }
@@ -133,7 +133,7 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
     labelColor,
   });
 
-  const labelId = createLabelResult?.createLabel?.label?.id;
+  const labelId = createLabelResult?.createLabel?.label?.id as string;
   
   return labelId;
 }
@@ -188,7 +188,7 @@ async function retrievePullRequest(octokit: InstanceType<typeof GitHub>, repoOwn
 }
 
 // This function retrieves the timeline events for a pull request
-async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, prNumber: number): Promise<any[]> {
+async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, prNumber: number): Promise<Array<Record<string, any>>> {
   
   // We assume there won't be more than 100 timeline events
   const retrieveTimelineEventsQuery = `
@@ -242,7 +242,7 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
     prNumber,
   });
 
-  const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes;
+  const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes as Array<Record<string, any>>;
   
   return timelineEvents;
 }
@@ -257,7 +257,8 @@ async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOw
 
   // This way to retrieve linked issues is not straightforward, but there's currently no easier way to obtain linked issues thanks to Github APIs
   timelineEvents?.forEach((event) => {
-    const issue = event.subject;
+    const issue = event.subject as Record<string, any>;
+
 
     if (event?.__typename === 'ConnectedEvent') {
       linkedIssuesMap[issue.id] = {
@@ -268,7 +269,7 @@ async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOw
         createdAt: event?.createdAt,
       };
     } else if (event?.__typename === 'DisconnectedEvent') {
-      const linkedIssue = linkedIssuesMap[issue.id];
+      const linkedIssue = linkedIssuesMap[issue.id] as Labelable;
 
       if (linkedIssue && new Date(event?.createdAt) > new Date(linkedIssue?.createdAt)) {
         delete linkedIssuesMap[issue.id];
