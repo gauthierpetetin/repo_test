@@ -28,5 +28,5 @@ jobs:
         id: add_release_label_to_pr_and_linked_issues
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          NEXT_RELEASE_CUT_NUMBER: ${{ env.NEXT_RELEASE_CUT_NUMBER }}
+          NEXT_RELEASE_CUT_NUMBER: ${{ vars.NEXT_RELEASE_CUT_NUMBER }}
         run: npm run add_release_label_to_pr_and_linked_issues
