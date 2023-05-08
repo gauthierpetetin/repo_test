@@ -46,7 +46,9 @@ async function main(): Promise<void> {
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(
     personalAccessToken,
-    previews: ["bane"], // The "bane" preview is required for adding, updating, creating and deleting labels.
+    {
+      previews: ["bane"], // The "bane" preview is required for adding, updating, creating and deleting labels.
+    },
   );
 
   // Retrieve pull request info from context
