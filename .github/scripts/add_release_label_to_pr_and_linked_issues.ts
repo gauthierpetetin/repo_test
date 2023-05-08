@@ -19,9 +19,10 @@ main().catch((error: Error): void => {
 async function main(): Promise<void> {
   // "GITHUB_TOKEN" is an automatically generated, repository-specific access token provided by GitHub Actions.
   // We can't use "GITHUB_TOKEN" here, as its permissions are scoped to the repository where the action is running.
-  // "GITHUB_TOKEN" does not have access to other repositories, even if they belong to the same organization.
+  // "GITHUB_TOKEN" does not have access to other repositories, even when they belong to the same organization.
   // As we want to update linked issues which are not necessarily located in the same repository,
-  // we need to create our own "PERSONAL_ACCESS_TOKEN" with access to other repositories of the MetaMask organisation.
+  // we need to create our own "PERSONAL_ACCESS_TOKEN" with "repo" permissions.
+  // Such a token allows to access other repositories of the MetaMask organisation.
   const personalAccessToken = process.env.PERSONAL_ACCESS_TOKEN;
   if (!personalAccessToken) {
     core.setFailed('PERSONAL_ACCESS_TOKEN not found');
