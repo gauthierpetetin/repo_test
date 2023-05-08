@@ -80,7 +80,11 @@ async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: str
   }
 `;
   
-  const retrieveRepoResult = await octokit.graphql(retrieveRepoQuery, {
+  const retrieveRepoResult: {
+    repository: {
+      id: string;
+    };
+  } = await octokit.graphql(retrieveRepoQuery, {
     repoOwner,
     repoName,
   });
@@ -103,7 +107,13 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
     }
   `;
   
-  const retrieveLabelResult = await octokit.graphql(retrieveLabelQuery, {
+  const retrieveLabelResult: {
+    repository: {
+      label: {
+        id: string;
+      };
+    };
+  } = await octokit.graphql(retrieveLabelQuery, {
     repoOwner,
     repoName,
     labelName,
@@ -127,7 +137,13 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
     }
   `;
   
-  const createLabelResult = await octokit.graphql(createLabelMutation, {
+  const createLabelResult: {
+    createLabel: {
+      label: {
+        id: string;
+      };
+    };
+  } = await octokit.graphql(createLabelMutation, {
     repoId,
     labelName,
     labelColor,
@@ -170,7 +186,19 @@ async function retrievePullRequest(octokit: InstanceType<typeof GitHub>, repoOwn
     }
   `;
 
-  const retrievePullRequestResult = await octokit.graphql(retrievePullRequestQuery, {
+  const retrievePullRequestResult: {
+    repository: {
+      pullRequest: {
+        id: string;
+        labels: {
+          nodes: Array<{
+            id: string;
+            name: string;
+          }>;
+        };
+      };
+    };
+  } = await octokit.graphql(retrievePullRequestQuery, {
     repoOwner,
     repoName,
     prNumber,
