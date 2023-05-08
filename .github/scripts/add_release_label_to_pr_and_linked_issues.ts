@@ -336,15 +336,15 @@ async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelab
   // Retrieve label from the labelable's repo, or create label if required
   const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor);
 
-  const addLabelToLabelableMutation = `
-    mutation addLabelToLabelable($labelableId: ID!, $labelIds: [ID!]!) {
-      addLabelToLabelable(input: {labelableId: $labelableId, labelIds: $labelIds}) {
+  const addLabelsToLabelableMutation = `
+    mutation AddLabelsToLabelable($labelableId: ID!, $labelIds: [ID!]!) {
+      addLabelsToLabelable(input: {labelableId: $labelableId, labelIds: $labelIds}) {
         clientMutationId
       }
     }
   `;
   
-  await octokit.graphql(addLabelToLabelableMutation, {
+  await octokit.graphql(addLabelsToLabelableMutation, {
     labelableId: labelable?.id,
     labelIds: [labelId],
   });
