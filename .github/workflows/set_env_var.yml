@@ -1,0 +1,16 @@
+name: my workflow
+on:
+  workflow_dispatch:
+    inputs:
+      foo:
+        description: 'Input for foo'
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set FOO
+      run: echo "FOO=${{ github.event.inputs.foo }}" >> $GITHUB_ENV
+    - name: Test
+      run: echo $FOO
