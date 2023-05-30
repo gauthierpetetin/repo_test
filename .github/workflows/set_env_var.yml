@@ -1,4 +1,4 @@
-name: my workflow
+name: set env variable
 on:
   workflow_dispatch:
     inputs:
