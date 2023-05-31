@@ -17,7 +17,7 @@ jobs:
         
       - name: Get workflow ID
         id: get-workflow-id
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const { owner, repo } = context.repo
@@ -30,7 +30,7 @@ jobs:
 
       - name: Get the latest successful workflow run ID
         id: get-workflow-run-id
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const { owner, repo } = context.repo
