@@ -1,4 +1,4 @@
-name: set env variable
+name: set next release cut number
 on:
   workflow_dispatch:
     inputs:
