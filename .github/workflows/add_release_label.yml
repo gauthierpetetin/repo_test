@@ -24,10 +24,22 @@ jobs:
       - name: Load environment variable
         id: load_var
         run: |
+          echo "Checking for environment variable and artifact..."
+
           if [ -n "${{ vars.NEXT_RELEASE_CUT_NUMBER }}" ]; then
+            echo "Environment variable NEXT_RELEASE_CUT_NUMBER is set:"
+            echo "${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
             echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
-          elif [ -f env_var.txt ]; then
+          else
+            echo "Environment variable NEXT_RELEASE_CUT_NUMBER is not set."
+          fi
+
+          if [ -f env_var.txt ]; then
+            echo "Artifact env_var.txt exists with contents:"
+            cat env_var.txt
             echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::$(cat env_var.txt)"
+          else
+            echo "Artifact env_var.txt does not exist."
           fi
 
       - name: Set up Node.js
