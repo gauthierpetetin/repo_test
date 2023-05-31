@@ -52,7 +52,7 @@ jobs:
       - name: Download artifact # the artifact is created by the github action used to create the release branch when a new release is cut
         run: |
           curl -L -o artifact.zip -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.get-artifact-url.outputs.result }}
-    unzip artifact.zip
+          unzip artifact.zip
         
       - name: Load environment variable
         id: load_var
