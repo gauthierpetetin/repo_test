@@ -63,10 +63,10 @@ jobs:
             echo "Environment variable NEXT_RELEASE_CUT_NUMBER is set:"
             echo "${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
             echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
-          elif [ -f env_var.txt ]; then
-            echo "Artifact env_var.txt exists with contents:"
-            cat env_var.txt
-            echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::$(cat env_var.txt)"
+          elif [ -f next_release_cut_number.txt ]; then
+            echo "Artifact next_release_cut_number.txt exists with contents:"
+            cat next_release_cut_number.txt
+            echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::$(cat next_release_cut_number.txt)"
           else
             echo "Neither environment variable nor artifact found."
             exit 1
