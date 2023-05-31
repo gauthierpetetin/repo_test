@@ -15,10 +15,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
+      - name: Get the latest successful workflow run ID
+        id: get-workflow-run-id
+        uses: octokit/graphql-action@v2.x
+        with:
+          query: |
+            query {
+              repository(owner: "gauthierpetetin-test", name: "repo_test") {
+                workflowRun(workflowName: "set env variable", first: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+                  nodes {
+                    id
+                  }
+                }
+              }
+            }
+          token: ${{ secrets.GITHUB_TOKEN }}
+        # Extract the run ID from the query result
+        id: run_id
+        run: |
+          run_id=$(echo '${{ steps.get-workflow-run-id.outputs.data }}' | jq -r '.data.repository.workflowRun.nodes[0].id')
+          echo "::set-output name=result::${run_id}"
+        
       - name: Download environment variable from artifact # the artifact is created by the github action used to create the release branch when a new release is cut
         uses: actions/download-artifact@v2
         with:
           name: env_var
+          run_id: ${{ steps.get-workflow-run-id.outputs.result }}
         continue-on-error: true  # So the workflow doesn't fail if the artifact does not exist
         
       - name: Load environment variable
