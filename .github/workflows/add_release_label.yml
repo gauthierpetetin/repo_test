@@ -20,20 +20,20 @@ jobs:
         uses: actions/github-script@v4
         with:
           script: |
-            const { owner, repo } = context.repo
+            const { owner, repo } = github.context.repo
             const workflows = await github.rest.actions.listRepoWorkflows({
               owner,
               repo
             })
-            const workflow = workflows.data.workflows.find(w => w.name === 'set env variable') // Name of the workflow where the artifcat containing "NEXT_RELEASE_CUT_NUMBER" is created
+            const workflow = workflows.data.workflows.find(w => w.name === 'set env variable')
             return workflow.id
-        
+
       - name: Get the latest successful workflow run ID
         id: get-workflow-run-id
         uses: actions/github-script@v4
         with:
           script: |
-            const { owner, repo } = context.repo
+            const { owner, repo } = github.context.repo
             const workflows = await github.rest.actions.listWorkflowRuns({
               owner,
               repo,
