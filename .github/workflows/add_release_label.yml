@@ -15,6 +15,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
+      - name: Get workflow ID
+        id: get-workflow-id
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo
+            const workflows = await github.rest.actions.listRepoWorkflows({
+              owner,
+              repo
+            })
+            const workflow = workflows.data.workflows.find(w => w.name === 'set env variable')
+            return workflow.id
+        
       - name: Get the artifact download URL
         id: get-artifact-url
         uses: actions/github-script@v6
