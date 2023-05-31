@@ -14,6 +14,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Download environment variable from artifact # the artifact is created by the github action used to create the release branch when a new release is cut
+        uses: actions/download-artifact@v2
+        with:
+          name: env_var
+        continue-on-error: true  # So the workflow doesn't fail if the artifact does not exist
+        
+      - name: Load environment variable
+        id: load_var
+        run: |
+          if [ -n "${{ vars.NEXT_RELEASE_CUT_NUMBER }}" ]; then
+            echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
+          elif [ -f env_var.txt ]; then
+            echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::$(cat env_var.txt)"
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -30,5 +45,5 @@ jobs:
         id: add_release_label_to_pr_and_linked_issues
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          NEXT_RELEASE_CUT_NUMBER: ${{ vars.NEXT_RELEASE_CUT_NUMBER }}
+          NEXT_RELEASE_CUT_NUMBER: ${{ steps.load_var.outputs.NEXT_RELEASE_CUT_NUMBER }}
         run: npm run add_release_label_to_pr_and_linked_issues
