@@ -1,4 +1,4 @@
-name: set next release cut number
+name: Set next release cut number
 on:
   workflow_dispatch:
     inputs:
@@ -9,10 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Set environment variable
+    - name: Save next release cut number in a text file
       run: echo "${{ github.event.inputs.next-release-cut-number }}" > next_release_cut_number.txt
 
-    - name: Upload environment variable as artifact
+    - name: Upload text file as artifact
       uses: actions/upload-artifact@v2
       with:
         name: next_release_cut_number
