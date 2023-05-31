@@ -29,19 +29,19 @@ jobs:
             return workflow.id
         
       - name: Get the latest successful workflow run ID
-      id: get-workflow-run-id
-      uses: actions/github-script@v4
-      with:
-        script: |
-          const { owner, repo } = context.repo
-          const workflows = await github.rest.actions.listWorkflowRuns({
-            owner,
-            repo,
-            workflow_id: ${{ steps.get-workflow-id.outputs.result }},
-            event: 'workflow_dispatch',
-            status: 'success'
-          })
-          return workflows.data.workflow_runs[0].id
+        id: get-workflow-run-id
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { owner, repo } = context.repo
+            const workflows = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id: ${{ steps.get-workflow-id.outputs.result }},
+              event: 'workflow_dispatch',
+              status: 'success'
+            })
+            return workflows.data.workflow_runs[0].id
         
       - name: Download environment variable from artifact # the artifact is created by the github action used to create the release branch when a new release is cut
         uses: actions/download-artifact@v2
@@ -59,16 +59,13 @@ jobs:
             echo "Environment variable NEXT_RELEASE_CUT_NUMBER is set:"
             echo "${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
             echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::${{ vars.NEXT_RELEASE_CUT_NUMBER }}"
-          else
-            echo "Environment variable NEXT_RELEASE_CUT_NUMBER is not set."
-          fi
-
-          if [ -f env_var.txt ]; then
+          elif [ -f env_var.txt ]; then
             echo "Artifact env_var.txt exists with contents:"
             cat env_var.txt
             echo "::set-output name=NEXT_RELEASE_CUT_NUMBER::$(cat env_var.txt)"
           else
-            echo "Artifact env_var.txt does not exist."
+            echo "Neither environment variable nor artifact found."
+            exit 1
           fi
 
       - name: Set up Node.js
