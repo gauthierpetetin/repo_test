@@ -10,15 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set environment variable
-      run: echo "NEXT_RELEASE_CUT_NUMBER=${{ github.event.inputs.next-release-cut-number }}" > env_var.txt
-
-    - name: Load and test environment variable
-      run: |
-        source env_var.txt
-        echo $NEXT_RELEASE_CUT_NUMBER
+      run: echo "${{ github.event.inputs.next-release-cut-number }}" > next_release_cut_number.txt
 
     - name: Upload environment variable as artifact
       uses: actions/upload-artifact@v2
       with:
-        name: env_var
-        path: env_var.txt
+        name: next_release_cut_number
+        path: next_release_cut_number.txt
