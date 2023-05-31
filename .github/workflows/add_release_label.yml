@@ -15,40 +15,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      - name: Get workflow ID
-        id: get-workflow-id
+      - name: Get the artifact download URL
+        id: get-artifact-url
         uses: actions/github-script@v6
         with:
           script: |
-            const { owner, repo } = context.repo
-            const workflows = await github.rest.actions.listRepoWorkflows({
-              owner,
-              repo
-            })
-            const workflow = workflows.data.workflows.find(w => w.name === 'set env variable')
-            return workflow.id
-
-      - name: Get the latest successful workflow run ID
-        id: get-workflow-run-id
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { owner, repo } = context.repo
-            const workflows = await github.rest.actions.listWorkflowRuns({
+            const { owner, repo } = github.context.repo
+            const runs = await github.rest.actions.listWorkflowRuns({
               owner,
               repo,
               workflow_id: ${{ steps.get-workflow-id.outputs.result }},
-              event: 'workflow_dispatch',
-              status: 'success'
+              status: 'completed'
             })
-            return workflows.data.workflow_runs[0].id
-        
-      - name: Download environment variable from artifact # the artifact is created by the github action used to create the release branch when a new release is cut
-        uses: actions/download-artifact@v2
-        with:
-          name: env_var
-          run_id: ${{ steps.get-workflow-run-id.outputs.result }}
-        continue-on-error: true  # So the workflow doesn't fail if the artifact does not exist
+            const runId = runs.data.workflow_runs[0].id
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner,
+              repo,
+              run_id: runId
+            })
+            const artifact = artifacts.data.artifacts.find(a => a.name === 'env_var')
+            return artifact.archive_download_url
+
+      - name: Download artifact # the artifact is created by the github action used to create the release branch when a new release is cut
+        run: |
+          curl -L -o artifact.zip "${{ steps.get-artifact-url.outputs.result }}"
+          unzip artifact.zip
         
       - name: Load environment variable
         id: load_var
