@@ -2,15 +2,19 @@ name: set env variable
 on:
   workflow_dispatch:
     inputs:
-      foo:
-        description: 'Input for foo'
+      next-release-cut-number:
+        description: 'Input next release cut number'
         required: true
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set FOO
-      run: echo "FOO=${{ github.event.inputs.foo }}" >> $GITHUB_ENV
+    - name: Set environment variable
+      run: echo "NEXT_RELEASE_CUT_NUMBER=${{ github.event.inputs.next-release-cut-number }}" > env_var.txt
     - name: Test
-      run: echo $FOO
+      run: echo $NEXT_RELEASE_CUT_NUMBER
+    - name: Upload environment variable as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: env_var
+        path: env_var.txt
