@@ -20,7 +20,7 @@ jobs:
         uses: actions/github-script@v4
         with:
           script: |
-            const { owner, repo } = github.context.repo
+            const { owner, repo } = context.repo
             const workflows = await github.rest.actions.listRepoWorkflows({
               owner,
               repo
@@ -33,7 +33,7 @@ jobs:
         uses: actions/github-script@v4
         with:
           script: |
-            const { owner, repo } = github.context.repo
+            const { owner, repo } = context.repo
             const workflows = await github.rest.actions.listWorkflowRuns({
               owner,
               repo,
