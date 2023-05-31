@@ -11,8 +11,12 @@ jobs:
     steps:
     - name: Set environment variable
       run: echo "NEXT_RELEASE_CUT_NUMBER=${{ github.event.inputs.next-release-cut-number }}" > env_var.txt
-    - name: Test
-      run: echo $NEXT_RELEASE_CUT_NUMBER
+
+    - name: Load and test environment variable
+      run: |
+        source env_var.txt
+        echo $NEXT_RELEASE_CUT_NUMBER
+
     - name: Upload environment variable as artifact
       uses: actions/upload-artifact@v2
       with:
