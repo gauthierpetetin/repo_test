@@ -46,7 +46,7 @@ jobs:
               repo,
               run_id: runId
             })
-            const artifact = artifacts.data.artifacts.find(a => a.name === 'env_var')
+            const artifact = artifacts.data.artifacts.find(a => a.name === 'next_release_cut_number')
             return artifact.archive_download_url
 
       - name: Download artifact # the artifact is created by the github action used to create the release branch when a new release is cut
