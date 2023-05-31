@@ -25,7 +25,7 @@ jobs:
               owner,
               repo
             })
-            const workflow = workflows.data.workflows.find(w => w.name === 'set env variable')
+            const workflow = workflows.data.workflows.find(w => w.name === 'Set next release cut number')
             return workflow.id
         
       - name: Get the artifact download URL
