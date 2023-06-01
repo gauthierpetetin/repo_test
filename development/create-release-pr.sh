@@ -15,8 +15,8 @@ fi
 RELEASE_BRANCH_NAME="${RELEASE_BRANCH_PREFIX}${NEW_VERSION}"
 RELEASE_BODY="This is the release candidate for version ${NEW_VERSION}."
 
-git config user.name metamaskbot
-git config user.email metamaskbot@users.noreply.github.com
+git config user.name gauthierpetetin-test
+git config user.email gauthierpetetin.test@gmail.com
 
 git checkout -b "${RELEASE_BRANCH_NAME}"
 
