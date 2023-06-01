@@ -9,9 +9,6 @@ on:
       semver-version:
         description: 'A semantic version. eg: x.x.x'
         required: true
-      version-number:
-        description: 'A natural version number. eg: 862'
-        required: true
       next-semver-version:
         description: 'Another semantic version. eg: x.x.x (next release version number)'
         required: true
