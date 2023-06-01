@@ -28,26 +28,26 @@ async function main(): Promise<void> {
     core.setFailed('PERSONAL_ACCESS_TOKEN not found');
     process.exit(1);
   }
-  
-  const nextReleaseCutNumber = process.env.NEXT_RELEASE_CUT_NUMBER;
-  if (!nextReleaseCutNumber) {
-    // NEXT_RELEASE_CUT_NUMBER is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
-    // NEXT_RELEASE_CUT_NUMBER needs to be updated every time a new release is cut.
+
+  const nextReleaseVersionNumber = process.env.NEXT_SEMVER_VERSION;
+  if (!nextReleaseVersionNumber) {
+    // NEXT_SEMVER_VERSION is defined in section "Secrets and variables">"Actions">"Variables">"New repository variable" in the settings of this repo.
+    // NEXT_SEMVER_VERSION needs to be updated every time a new release is cut.
     // Example value: 6.5.0
-    core.setFailed('NEXT_RELEASE_CUT_NUMBER not found');
+    core.setFailed('NEXT_SEMVER_VERSION not found');
     process.exit(1);
   }
 
-  if (!isValidVersionFormat(nextReleaseCutNumber)) {
-    core.setFailed(`NEXT_RELEASE_CUT_NUMBER (${nextReleaseCutNumber}) is not a valid version format. The expected format is "x.y.z", where "x", "y" and "z" are numbers.`);
+  if (!isValidVersionFormat(nextReleaseVersionNumber)) {
+    core.setFailed(`NEXT_SEMVER_VERSION (${nextReleaseVersionNumber}) is not a valid version format. The expected format is "x.y.z", where "x", "y" and "z" are numbers.`);
     process.exit(1);
   }
-  
-  // Release label indicates the next release cut number
+
+  // Release label indicates the next release version number
   // Example release label: "release-6.5.0"
-  const releaseLabelName = `release-${nextReleaseCutNumber}`;
+  const releaseLabelName = `release-${nextReleaseVersionNumber}`;
   const releaseLabelColor = "ededed";
-  const releaseLabelDescription = `Issue or pull request that will be included in release ${nextReleaseCutNumber}`;
+  const releaseLabelDescription = `Issue or pull request that will be included in release ${nextReleaseVersionNumber}`;
 
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(
@@ -65,16 +65,16 @@ async function main(): Promise<void> {
     core.setFailed('Pull request number not found');
     process.exit(1);
   }
-  
+
   // Retrieve pull request
   const pullRequest: Labelable = await retrievePullRequest(octokit, prRepoOwner, prRepoName, prNumber);
-  
+
   // Add the release label to the pull request
   await addLabelToLabelable(octokit, pullRequest, releaseLabelName, releaseLabelColor, releaseLabelDescription);
-  
+
   // Retrieve linked issues for the pull request
   const linkedIssues: Labelable[] = await retrieveLinkedIssues(octokit, prRepoOwner, prRepoName, prNumber);
-  
+
   // Add the release label to the linked issues
   for (const linkedIssue of linkedIssues) {
     await addLabelToLabelable(octokit, linkedIssue, releaseLabelName, releaseLabelColor, releaseLabelDescription);
@@ -89,7 +89,7 @@ function isValidVersionFormat(str: string): boolean {
 
 // This function retrieves the repo
 async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string): Promise<string> {
-  
+
   const retrieveRepoQuery = `
   query RetrieveRepo($repoOwner: String!, $repoName: String!) {
     repository(owner: $repoOwner, name: $repoName) {
@@ -97,7 +97,7 @@ async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: str
     }
   }
 `;
-  
+
   const retrieveRepoResult: {
     repository: {
       id: string;
@@ -114,7 +114,7 @@ async function retrieveRepo(octokit: InstanceType<typeof GitHub>, repoOwner: str
 
 // This function retrieves the label on a specific repo
 async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, labelName: string): Promise<string> {
-  
+
   const retrieveLabelQuery = `
     query RetrieveLabel($repoOwner: String!, $repoName: String!, $labelName: String!) {
       repository(owner: $repoOwner, name: $repoName) {
@@ -124,7 +124,7 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
       }
     }
   `;
-  
+
   const retrieveLabelResult: {
     repository: {
       label: {
@@ -144,7 +144,7 @@ async function retrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: st
 
 // This function creates the label on a specific repo
 async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string, labelName: string, labelColor: string, labelDescription: string): Promise<string> {
-  
+
   const createLabelMutation = `
     mutation CreateLabel($repoId: ID!, $labelName: String!, $labelColor: String!, $labelDescription: String) {
       createLabel(input: {repositoryId: $repoId, name: $labelName, color: $labelColor, description: $labelDescription}) {
@@ -154,7 +154,7 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
       }
     }
   `;
-  
+
   const createLabelResult: {
     createLabel: {
       label: {
@@ -169,13 +169,13 @@ async function createLabel(octokit: InstanceType<typeof GitHub>, repoId: string,
   });
 
   const labelId = createLabelResult?.createLabel?.label?.id;
-  
+
   return labelId;
 }
 
 // This function creates or retrieves the label on a specific repo
 async function createOrRetrieveLabel(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, labelName: string, labelColor: string, labelDescription: string): Promise<string> {
-  
+
   // Check if label already exists on the repo
   let labelId = await retrieveLabel(octokit, repoOwner, repoName, labelName);
 
@@ -183,17 +183,17 @@ async function createOrRetrieveLabel(octokit: InstanceType<typeof GitHub>, repoO
   if (!labelId) {
     // Retrieve PR's repo
     const repoId = await retrieveRepo(octokit, repoOwner, repoName);
-    
+
     // Create label on repo
     labelId = await createLabel(octokit, repoId, labelName, labelColor, labelDescription);
   }
-  
+
   return labelId;
 }
 
 // This function retrieves the pull request on a specific repo
 async function retrievePullRequest(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable> {
-  
+
   const retrievePullRequestQuery = `
     query GetPullRequest($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
       repository(owner: $repoOwner, name: $repoName) {
@@ -225,13 +225,13 @@ async function retrievePullRequest(octokit: InstanceType<typeof GitHub>, repoOwn
     repoName: repoName,
     createdAt: retrievePullRequestResult?.repository?.pullRequest?.createdAt,
   }
-  
+
   return pullRequest;
 }
 
 // This function retrieves the timeline events for a pull request
 async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, prNumber: number): Promise<Array<Record<string, any>>> {
-  
+
   // We assume there won't be more than 100 timeline events
   const retrieveTimelineEventsQuery = `
     query($repoOwner: String!, $repoName: String!, $prNumber: Int!) {
@@ -277,7 +277,7 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
       }
     }
   `;
-  
+
   const retrieveTimelineEventsResult: {
     repository: {
       pullRequest: {
@@ -306,16 +306,16 @@ async function retrieveTimelineEvents(octokit: InstanceType<typeof GitHub>, repo
   });
 
   const timelineEvents = retrieveTimelineEventsResult?.repository?.pullRequest?.timelineItems?.nodes;
-  
+
   return timelineEvents;
 }
 
 // This function retrieves the list of linked issues for a pull request
 async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, prNumber: number): Promise<Labelable[]> {
-  
+
   // The list of linked issues can be deduced from timeline events
   const timelineEvents = await retrieveTimelineEvents(octokit, repoOwner, repoName, prNumber);
-  
+
   const linkedIssuesMap: Record<string, Labelable> = {};
 
   // This way to retrieve linked issues is not straightforward, but there's currently no easier way to obtain linked issues thanks to Github APIs
@@ -341,13 +341,13 @@ async function retrieveLinkedIssues(octokit: InstanceType<typeof GitHub>, repoOw
   });
 
   const linkedIssues = Object.values(linkedIssuesMap);
-  
+
   return linkedIssues;
 }
 
 // This function adds label to a labelable object (i.e. a pull request or an issue)
 async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelable: Labelable, labelName: string, labelColor: string, labelDescription: string): Promise<void> {
-  
+
   // Retrieve label from the labelable's repo, or create label if required
   const labelId = await createOrRetrieveLabel(octokit, labelable?.repoOwner, labelable?.repoName, labelName, labelColor, labelDescription);
 
@@ -358,10 +358,10 @@ async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelab
       }
     }
   `;
-  
+
   await octokit.graphql(addLabelsToLabelableMutation, {
     labelableId: labelable?.id,
     labelIds: [labelId],
    });
-  
+
 }
