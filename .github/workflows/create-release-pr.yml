@@ -34,8 +34,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
-      - name: Add execute permissions for script
-        run: chmod +x development/create-release-pr.sh
       - name: Create Release PR
         id: create-release-pr
         shell: bash
