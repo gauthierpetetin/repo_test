@@ -38,7 +38,7 @@ jobs:
         id: create-release-pr
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           ./development/create-release-pr.sh ${{ github.event.inputs.semver-version }}
       - name: Save next release version number in a text file
