@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       base-branch:
-        description: 'The base branch, tag, or SHA for git operations and the pull request.'
+        description: 'The base branch, tag, or SHA for git operations.'
         required: true
       semver-version:
         description: 'A semantic version. eg: x.x.x'
@@ -14,7 +14,7 @@ on:
         required: true
 
 jobs:
-  create-release-pr:
+  create-release-branch:
     runs-on: ubuntu-latest
     permissions:
       contents: write
