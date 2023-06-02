@@ -20,7 +20,7 @@ git config user.email gauthierpetetin.test@gmail.com
 
 git checkout -b "${RELEASE_BRANCH_NAME}"
 
-if ! (git add . && git commit -m "${NEW_VERSION}");
+if ! (git add . && git commit --allow-empty -m "${NEW_VERSION}");
 then
     echo "Error: No changes detected."
     exit 1
