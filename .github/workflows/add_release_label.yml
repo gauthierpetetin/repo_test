@@ -49,5 +49,5 @@ jobs:
         id: add_release_label_to_pr_and_linked_issues
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          NEXT_SEMVER_VERSION: ${{ steps.get-next-semver-version.outputs.NEXT_SEMVER_VERSION }}
+          NEXT_SEMVER_VERSION: ${{ env.NEXT_SEMVER_VERSION }}
         run: npm run add_release_label_to_pr_and_linked_issues
