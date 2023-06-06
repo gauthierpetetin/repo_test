@@ -43,7 +43,7 @@ jobs:
           # Increment the minor version of the highest version found
           NEXT_VERSION=$(echo $HIGHEST_VERSION | awk -F. -v OFS=. '{$2++; print}')
 
-          echo "::set-output name=NEXT_SEMVER_VERSION::${NEXT_VERSION}"
+          echo "NEXT_SEMVER_VERSION=${NEXT_VERSION}" >> $GITHUB_ENV
           
       - name: Add release label to PR and linked issues
         id: add_release_label_to_pr_and_linked_issues
