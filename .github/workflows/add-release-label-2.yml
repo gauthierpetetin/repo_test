@@ -80,7 +80,7 @@ jobs:
           node-version: '16'
 
       - name: Install dependencies
-        run: yarn
+        run: yarn --immutable
 
       - name: Add release label to PR and linked issues
         id: add-release-label-to-pr-and-linked-issues
