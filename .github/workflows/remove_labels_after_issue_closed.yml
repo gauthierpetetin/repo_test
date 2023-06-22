@@ -10,7 +10,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     permissions:
-      contents: write 
+      issues: read/write 
 
     steps:
     - name: Remove labels
