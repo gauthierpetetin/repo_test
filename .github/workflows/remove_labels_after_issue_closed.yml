@@ -5,12 +5,12 @@ on:
     types: [closed]
   pull_request:
     types: [closed]
+    
+permissions: write-all
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
 
     steps:
     - name: Remove labels
