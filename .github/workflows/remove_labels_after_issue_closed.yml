@@ -1,5 +1,8 @@
 name: Remove labels after issue (or PR) closed
 
+permissions:
+  issues: write
+
 on:
   issues:
     types: [closed]
@@ -9,8 +12,6 @@ on:
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    permissions:
-      issues: read/write 
 
     steps:
     - name: Remove labels
