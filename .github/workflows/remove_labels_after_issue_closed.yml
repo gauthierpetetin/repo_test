@@ -6,7 +6,8 @@ on:
   pull_request:
     types: [closed]
     
-permissions: write-all
+permissions:
+  issues: write
 
 jobs:
   cleanup:
