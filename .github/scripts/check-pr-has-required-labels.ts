@@ -35,7 +35,7 @@ async function main(): Promise<void> {
   let hasQALabel = false;
   let hasTeamLabel = false;
 
-  // Check pull request has at least requested QA label and team label
+  // Check pull request has at least required QA label and team label
   for (const label of prLabels) {
     if (qaLabels.includes(label)) {
       console.log(`PR contains a QA label as expected: ${label}`);
