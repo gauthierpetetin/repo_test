@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "add-release-label-to-pr-and-linked-issues": "ts-node ./.github/scripts/add-release-label-to-pr-and-linked-issues.ts",
-    "check-pr-has-required-labels": "ts-node ./.github/scripts/check-pr-has-required-labels.ts"
+    "check-pr-has-required-labels": "ts-node ./.github/scripts/check-pr-has-required-labels.ts",
+    "close-release-bug-report-issue": "ts-node ./.github/scripts/close-release-bug-report-issue.ts"
   },
   "devDependencies": {
     "typescript": "~4.4.0",
