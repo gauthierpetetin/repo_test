@@ -25,7 +25,9 @@ jobs:
               
 
             **Expected Actions for Release Engineers:**  
+              
             - Convert this issue into a Zenhub epic and link all bugs identified during the release regression testing phase to this epic.  
+              
             - After completing the first regression run, move this epic to "Regression Completed" on the [Extension Release Regression board](https://app.zenhub.com/workspaces/extension-release-regression-6478c62d937eaa15e95c33c5/board?filterLogic=any&labels=release-${{ steps.extract_version.outputs.version }},release-task).  
 
 
