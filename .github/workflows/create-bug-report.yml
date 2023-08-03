@@ -40,4 +40,4 @@ jobs:
               "release-${{ steps.extract_version.outputs.version }}"
             ]
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_LABEL_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BUG_REPORT_TOKEN }}
