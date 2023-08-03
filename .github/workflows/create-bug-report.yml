@@ -20,8 +20,14 @@ jobs:
           owner: gauthierpetetin-test
           private_repo: repo_test_2
           title: v${{ steps.extract_version.outputs.version }} Bug Report
-          body: "This bug report was automatically created by a GitHub action upon the creation of release branch release/${{ steps.extract_version.outputs.version }} (release cut).\n\n**Expected Actions for Release Engineers:**\n1. Convert this issue into a Zenhub epic and link all bugs identified during the release regression testing phase to this epic.\n2. After completing the first regression run, move this epic to \"Regression Completed\" on the [Extension Release Regression board](https://app.zenhub.com/workspaces/extension-release-regression-6478c62d937eaa15e95c33c5/board?filterLogic=any&labels=release-${{ steps.extract_version.outputs.version }},release-task).\n\nNote that once the release is prepared for store submission, meaning the release/${{ steps.extract_version.outputs.version }} branch merges into the main, another GitHub action will automatically close this epic."
+          body: >
+            This bug report was automatically created by a GitHub action upon the creation of release branch `release/${{ steps.extract_version.outputs.version }}` (release cut).
 
+            **Expected Actions for Release Engineers:**
+            1. Convert this issue into a Zenhub epic and link all bugs identified during the release regression testing phase to this epic.
+            2. After completing the first regression run, move this epic to "Regression Completed" on the [Extension Release Regression board](https://app.zenhub.com/workspaces/extension-release-regression-6478c62d937eaa15e95c33c5/board?filterLogic=any&labels=release-${{ steps.extract_version.outputs.version }},release-task).
+
+            Note that once the release is prepared for store submission, meaning the `release/${{ steps.extract_version.outputs.version }}` branch merges into `main`, another GitHub action will automatically close this epic.
           labels: |
             [
               "type-bug",
