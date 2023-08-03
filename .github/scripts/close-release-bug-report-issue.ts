@@ -41,11 +41,6 @@ async function main(): Promise<void> {
 
   const releaseVersionNumber = releaseVersionNumberMatch[1];
 
-  if (!isValidVersionFormat(releaseVersionNumber)) {
-    core.setFailed(`Extracted release version (${releaseVersionNumber}) is not a valid version format. The expected format is "x.y.z", where "x", "y" and "z" are numbers.`);
-    process.exit(1);
-  }
-
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(personalAccessToken);
 
@@ -64,12 +59,6 @@ async function main(): Promise<void> {
 
   console.log(`Issue with id: ${bugReportIssue.id} successfully closed`);
   
-}
-
-// This helper function checks if version has the correct format: "x.y.z" where "x", "y" and "z" are numbers.
-function isValidVersionFormat(str: string): boolean {
-    const regex = /^\d+\.\d+\.\d+$/;
-    return regex.test(str);
 }
 
 // This function retrieves the issue titled "vx.y.z Bug Report" on a specific repo
