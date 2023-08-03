@@ -20,7 +20,7 @@ jobs:
           labels: |
             [
               "type-bug",
-              "regression-RC"
+              "regression-RC",
               "release-${{ github.ref_name }}"
             ]
         env:
