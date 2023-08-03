@@ -9,19 +9,23 @@ jobs:
   create-bug-report:
     runs-on: ubuntu-latest
     steps:
+      - name: Extract version from branch name
+        id: extract_version
+        run: echo "::set-output name=version::${GITHUB_REF#refs/heads/release/}"
+
       - name: Create bug report issue on planning repo
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/gauthierpetetin-test/repo_test_2/issues
           owner: gauthierpetetin-test
           private_repo: repo_test_2
-          title: v${{ github.ref_name }} Bug Report
-          body: Bug report for version ${{ github.ref_name }}
+          title: v${{ steps.extract_version.outputs.version }} Bug Report
+          body: Bug report for version ${{ steps.extract_version.outputs.version }}
           labels: |
             [
               "type-bug",
               "regression-RC",
-              "release-${{ github.ref_name }}"
+              "release-${{ steps.extract_version.outputs.version }}"
             ]
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_LABEL_TOKEN }}
