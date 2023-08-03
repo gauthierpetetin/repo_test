@@ -28,16 +28,21 @@ async function main(): Promise<void> {
       process.exit(1);
   }
 
-  const releaseVersionNumber = process.env.SEMVER_VERSION;
-  if (!releaseVersionNumber) {
-    // SEMVER_VERSION (x.y.z) is automatically extracted from the name of the release branch: "release/x.y.z"
-    // Example value: 6.5.0
-    core.setFailed('SEMVER_VERSION not found');
+  // Extract branch name from the context
+  const branchName: string = context.payload.pull_request?.head.ref || "";
+  
+  // Extract semver version number from the branch name
+  const releaseVersionNumberMatch = branchName.match(/^release\/(\d+\.\d+\.\d+)$/);
+  
+  if (!releaseVersionNumberMatch) {
+    core.setFailed(`Failed to extract version number from branch name: ${branchName}`);
     process.exit(1);
   }
 
+  const releaseVersionNumber = releaseVersionNumberMatch[1];
+
   if (!isValidVersionFormat(releaseVersionNumber)) {
-    core.setFailed(`SEMVER_VERSION (${releaseVersionNumber}) is not a valid version format. The expected format is "x.y.z", where "x", "y" and "z" are numbers.`);
+    core.setFailed(`Extracted release version (${releaseVersionNumber}) is not a valid version format. The expected format is "x.y.z", where "x", "y" and "z" are numbers.`);
     process.exit(1);
   }
 

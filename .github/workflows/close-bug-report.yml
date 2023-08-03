@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
     steps:
-      - name: Extract version from branch name
-        id: extract_version
-        run: echo "::set-output name=version::${{ github.event.pull_request.head.ref#release/ }}"
-
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -35,5 +31,4 @@ jobs:
         env:
           BUG_REPORT_REPO: repo_test_2
           BUG_REPORT_TOKEN: ${{ secrets.BUG_REPORT_TOKEN }}
-          SEMVER_VERSION: ${{ steps.extract_version.outputs.version }}
         run: npm run close-release-bug-report-issue
