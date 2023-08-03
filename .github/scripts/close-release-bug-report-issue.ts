@@ -74,40 +74,37 @@ function isValidVersionFormat(str: string): boolean {
 
 // This function retrieves the issue titled "vx.y.z Bug Report" on a specific repo
 async function retrieveOpenBugReportIssue(octokit: InstanceType<typeof GitHub>, repoOwner: string, repoName: string, releaseVersionNumber: string): Promise<{
-    id: string;
-    title: string;
+  id: string;
+  title: string;
 } | undefined> {
 
-  const retrieveOpenBugReportIssueQuery = `
-    query RetrieveOpenBugReportIssue($repoOwner: String!, $repoName: String!, $releaseVersionNumber: String!) {
-      search(query: "repo:" + $repoOwner + "/" + $repoName + " type:issue is:open in:title v" + $releaseVersionNumber + " Bug Report", type: ISSUE, first: 1) {
-        nodes {
-          ... on Issue {
-            id
-            title
-          }
+const retrieveOpenBugReportIssueQuery = `
+  query RetrieveOpenBugReportIssue {
+    search(query: "repo:${repoOwner}/${repoName} type:issue is:open in:title v${releaseVersionNumber} Bug Report", type: ISSUE, first: 1) {
+      nodes {
+        ... on Issue {
+          id
+          title
         }
       }
     }
-  `;
+  }
+`;
 
-  const retrieveOpenBugReportIssueQueryResult: {
-    search: {
-        nodes: {
-            id: string;
-            title: string;
-        }[];
-    };
-  } = await octokit.graphql(retrieveOpenBugReportIssueQuery, {
-    repoOwner,
-    repoName,
-    releaseVersionNumber,
-  });
+const retrieveOpenBugReportIssueQueryResult: {
+  search: {
+      nodes: {
+          id: string;
+          title: string;
+      }[];
+  };
+} = await octokit.graphql(retrieveOpenBugReportIssueQuery);
 
-  const bugReportIssues = retrieveOpenBugReportIssueQueryResult?.search?.nodes;
+const bugReportIssues = retrieveOpenBugReportIssueQueryResult?.search?.nodes;
 
-  return bugReportIssues?.length > 0 ? bugReportIssues[0] : undefined;
+return bugReportIssues?.length > 0 ? bugReportIssues[0] : undefined;
 }
+
 
 // This function closes a Github issue, based on its ID
 async function closeIssue(octokit: InstanceType<typeof GitHub>, issueId: string): Promise<string> {
