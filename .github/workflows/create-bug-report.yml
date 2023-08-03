@@ -17,6 +17,11 @@ jobs:
           private_repo: repo_test_2
           title: v${{ github.ref_name }} Bug Report
           body: Bug report for version ${{ github.ref_name }}
-          labels: epic,bug-report
+          labels: |
+            [
+              "type-bug",
+              "regression-RC"
+              "release-${{ github.ref_name }}"
+            ]
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_LABEL_TOKEN }}
