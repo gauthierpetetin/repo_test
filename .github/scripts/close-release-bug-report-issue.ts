@@ -80,7 +80,7 @@ async function retrieveOpenBugReportIssue(octokit: InstanceType<typeof GitHub>, 
 
   const retrieveOpenBugReportIssueQuery = `
     query RetrieveOpenBugReportIssue($repoOwner: String!, $repoName: String!, $releaseVersionNumber: String!) {
-      search(query: "repo:${repoOwner}/${repoName} type:issue is:open in:title v${releaseVersionNumber} Bug Report", type: ISSUE, first: 1) {
+      search(query: "repo:" + $repoOwner + "/" + $repoName + " type:issue is:open in:title v" + $releaseVersionNumber + " Bug Report", type: ISSUE, first: 1) {
         nodes {
           ... on Issue {
             id
@@ -88,7 +88,7 @@ async function retrieveOpenBugReportIssue(octokit: InstanceType<typeof GitHub>, 
           }
         }
       }
-  }
+    }
   `;
 
   const retrieveOpenBugReportIssueQueryResult: {
