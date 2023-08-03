@@ -1,0 +1,22 @@
+name: Create release bug report issue when release branch gets created
+
+on:
+  create:
+    branches:
+      - 'release/*'
+
+jobs:
+  create-bug-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create bug report issue on planning repo
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/gauthierpetetin-test/repo_test_2/issues
+          owner: gauthierpetetin-test
+          private_repo: repo_test_2
+          title: v${{ github.ref_name }} Bug Report
+          body: Bug report for version ${{ github.ref_name }}
+          labels: epic,bug-report
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_LABEL_TOKEN }}
