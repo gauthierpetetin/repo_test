@@ -1,8 +1,6 @@
 name: Create release bug report issue when release branch gets created
 
-on:
-  create:
-    branches:
+on: create
 
 jobs:
   create-bug-report:
@@ -14,7 +12,7 @@ jobs:
           if [[ $GITHUB_REF == refs/heads/release/* ]]; then
             version=${GITHUB_REF#refs/heads/release/}
             echo "New release branch($version), continue next steps"
-            echo "::set-output name=version::$version"
+            echo "version=$version" >> $GITHUB_ENV
           else
             echo "Not a release branch, skip next steps"
           fi
