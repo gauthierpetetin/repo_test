@@ -18,7 +18,7 @@ jobs:
           fi
 
       - name: Create bug report issue on planning repo
-        if: steps.extract_version.outputs.version
+        if: env.version
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/gauthierpetetin-test/repo_test_2/issues
