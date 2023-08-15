@@ -2,7 +2,7 @@ name: Create release bug report issue when release branch gets created
 
 on:
   create:
-    branches
+    branches:
 
 jobs:
   create-bug-report:
