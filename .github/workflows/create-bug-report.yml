@@ -1,7 +1,8 @@
 name: Create release bug report issue when release branch gets created
 
 on:
-  create:
+  workflow_dispatch:
+  push:
     branches:
       - 'release/*'
 
