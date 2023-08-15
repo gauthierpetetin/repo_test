@@ -2,7 +2,7 @@ name: Create release bug report issue when release branch gets created
 
 on:
   create:
-    branches:
+    branches
 
 jobs:
   create-bug-report:
@@ -14,7 +14,7 @@ jobs:
               echo "This action runs only for release/* branches. Exiting..."
               exit 0
             fi
-            
+
       - name: Extract version from branch name
         id: extract_version
         run: echo "::set-output name=version::${GITHUB_REF#refs/heads/release/}"
