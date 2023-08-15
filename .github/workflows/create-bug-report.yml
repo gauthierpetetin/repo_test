@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check branch is a release branch
-          run: |
-            if [[ $GITHUB_REF != refs/heads/release/* ]]; then
-              echo "This action runs only for release/* branches. Exiting..."
-              exit 0
-            fi
+        run: |
+          if [[ $GITHUB_REF != refs/heads/release/* ]]; then
+            echo "This action runs only for release/* branches. Exiting..."
+            exit 0
+          fi
 
       - name: Extract version from branch name
         id: extract_version
