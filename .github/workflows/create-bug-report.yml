@@ -8,18 +8,16 @@ jobs:
   create-bug-report:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch is a release branch
+      - name: Extract version from branch name if release branch
+        id: extract_version
         run: |
-          if [[ $GITHUB_REF != refs/heads/release/* ]]; then
-            echo "This action runs only for release/* branches. Exiting..."
-            exit 0
+          if [[ $GITHUB_REF == refs/heads/release/* ]]; then
+            version=${GITHUB_REF#refs/heads/release/}
+            echo "::set-output name=version::$version"
           fi
 
-      - name: Extract version from branch name
-        id: extract_version
-        run: echo "::set-output name=version::${GITHUB_REF#refs/heads/release/}"
-
       - name: Create bug report issue on planning repo
+        if: steps.extract_version.outputs.version
         uses: octokit/request-action@v2.x
         with:
           route: POST /repos/gauthierpetetin-test/repo_test_2/issues
