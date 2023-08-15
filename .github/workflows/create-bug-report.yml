@@ -23,7 +23,7 @@ jobs:
         with:
           route: POST /repos/gauthierpetetin-test/repo_test_2/issues
           owner: gauthierpetetin-test
-          title: v${{ steps.extract_version.outputs.version }} Bug Report
+          title: v${{ env.version }} Bug Report
           body: |
             This bug report was automatically created by a GitHub action upon the creation of release branch `release/${{ steps.extract_version.outputs.version }}` (release cut).  
               
