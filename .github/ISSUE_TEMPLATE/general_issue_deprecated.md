@@ -1,7 +1,7 @@
 ---
 name: General issue deprecated
 about: For any issues
-title: ''
+title: "[Deprecated]: "
 labels: ''
 assignees: ''
 ---
