@@ -1,5 +1,5 @@
-name: Example issue
-description: File a bug report
+name: "Example issue"
+description: "File a bug report"
 title: "[Example]: "
 labels: ["bug", "triage"]
 projects: ["octo-org/1", "octo-org/44"]
