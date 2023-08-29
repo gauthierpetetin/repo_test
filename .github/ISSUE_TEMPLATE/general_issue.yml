@@ -1,6 +1,5 @@
 name: "General issue"
 description: "This is a test issue"
-title: "[Bug]: "
 labels: []
 body:
  - type: markdown
