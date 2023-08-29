@@ -1,4 +1,4 @@
-name: Bug Report
+name: Bug Report Extension
 description: Using MetaMask, but it's not working as you expect?
 title: "[Bug]: "
 labels: ["type-bug"]
@@ -59,13 +59,18 @@ body:
        - Beta
        - Flask
        - Other (please specify exactly where you obtained this build in "Additional Context" section)
- - type: input
-   id: phones
+ - type: dropdown
+   id: browsers
    attributes:
-     label: Phone
-     description: Which phone have you seen the problem on?
-     placeholder: |
-       Brand and model of your phone
+     label: Browser
+     description: Which browsers have you seen the problem on?
+     multiple: true
+     options:
+       - Chrome
+       - Firefox
+       - Microsoft Edge
+       - Brave
+       - Other (please elaborate in the "Additional Context" section)
    validations:
      required: true
  - type: dropdown
@@ -75,8 +80,9 @@ body:
      description: Which operating systems have you seen the problem on?
      multiple: true
      options:
-       - iOS
-       - Android
+       - Windows
+       - MacOS
+       - Linux
        - Other (please elaborate in the "Additional Context" section)
    validations:
      required: true
