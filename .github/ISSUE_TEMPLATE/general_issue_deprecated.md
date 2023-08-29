@@ -1,5 +1,5 @@
 ---
-name: General issue Deprecated
+name: General issue deprecated
 about: For any issues
 title: ''
 labels: ''
