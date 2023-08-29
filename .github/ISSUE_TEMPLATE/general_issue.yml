@@ -14,13 +14,13 @@ body:
     attributes:
       label: What is this about?
       placeholder: Describe the issue here.
+    validations:
+      required: true
 
   - type: markdown
     attributes:
       value: |
         ## **Scenario (for user stories only)**
-    validations:
-      required: true
 
   - type: textarea
     id: scenario
