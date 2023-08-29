@@ -1,7 +1,7 @@
 name: "General issue"
 description: "This is a test issue"
-title: "[Bug]: "
-labels: ["type-bug"]
+title: ""
+labels: []
 body:
  - type: markdown
    attributes:
@@ -20,98 +20,3 @@ body:
      placeholder: A clear and concise description of what the bug is
    validations:
      required: true
- - type: textarea
-   id: screenshot
-   attributes:
-     label: Screenshots
-     description: Please include screenshots if applicable!
- - type: textarea
-   id: reproduce
-   attributes:
-     label: Steps to reproduce
-     description: "List all steps needed to reproduce the problem:"
-     placeholder: |
-       1. Go to '...'
-       2. Click on '...'
-       3. Scroll down to '...'
-       4. See error
-   validations:
-     required: true
- - type: textarea
-   id: error
-   attributes:
-     label: Error messages or log output
-     description: Please copy and paste any relevant error messages or log output. This will be automatically formatted, so there is no need for backticks.
-     render: shell
- - type: input
-   id: version
-   attributes:
-     label: Version
-     description: What version of MetaMask are you running? You can find the version in "Settings" > "About"
-   validations:
-     required: true
- - type: dropdown
-   id: build
-   attributes:
-     label: Build type
-     description: Are you using a testing or development build of MetaMask? If so, please select the type of build you are using.
-     options:
-       - Beta
-       - Flask
-       - Other (please specify exactly where you obtained this build in "Additional Context" section)
- - type: dropdown
-   id: browsers
-   attributes:
-     label: Browser
-     description: Which browsers have you seen the problem on?
-     multiple: true
-     options:
-       - Chrome
-       - Firefox
-       - Microsoft Edge
-       - Brave
-       - Other (please elaborate in the "Additional Context" section)
-   validations:
-     required: true
- - type: dropdown
-   id: os
-   attributes:
-     label: Operating system
-     description: Which operating systems have you seen the problem on?
-     multiple: true
-     options:
-       - Windows
-       - MacOS
-       - Linux
-       - Other (please elaborate in the "Additional Context" section)
-   validations:
-     required: true
- - type: dropdown
-   id: hardware-wallet
-   attributes:
-     label: Hardware wallet
-     description: Are you using any of these hardware wallets? Please include the firmware version in the "Additional context" section below for any that you select here.
-     multiple: true
-     options:
-       - Ledger
-       - Trezor
-       - Keystone
-       - GridPlus Lattice1
-       - AirGap Vault
-       - Other (please elaborate in the "Additional Context" section)
- - type: textarea
-   id: additional
-   attributes:
-     label: Additional context
-     description: Add any other context about the problem here, e.g. related issues, additional error messages or logs, or any potentially relevant details about the environment or situation the bug occurred in.
- - type: textarea
-   id: severity
-   attributes:
-     label: Severity
-     description: |
-       To be added after bug submission by internal support / PM:
-     placeholder: |
-       - How critical is the impact of this bug on a user?
-       - Add stats if available on % of customers impacted
-       - Is this visible to all users?
-       - Is this tech debt?
