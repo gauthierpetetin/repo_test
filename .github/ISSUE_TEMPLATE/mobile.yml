@@ -1,6 +1,6 @@
-name: Mobile
-description: Mobile not working?
-title: "[Mobile Bug]: "
+name: Bug Report
+description: Using MetaMask, but it's not working as you expect?
+title: "[Bug]: "
 labels: ["type-bug"]
 body:
  - type: markdown
