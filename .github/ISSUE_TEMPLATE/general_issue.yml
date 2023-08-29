@@ -19,6 +19,8 @@ body:
     attributes:
       value: |
         ## **Scenario (for user stories only)**
+    validations:
+      required: true
 
   - type: textarea
     id: scenario
