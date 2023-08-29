@@ -56,7 +56,6 @@ body:
      label: Build type
      description: Are you using a testing or development build of MetaMask? If so, please select the type of build you are using.
      options:
-       - None
        - Beta
        - Flask
        - Other (please specify exactly where you obtained this build in "Additional Context" section)
@@ -94,7 +93,6 @@ body:
      description: Are you using any of these hardware wallets? Please include the firmware version in the "Additional context" section below for any that you select here.
      multiple: true
      options:
-       - None
        - Ledger
        - Trezor
        - Keystone
