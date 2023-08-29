@@ -29,9 +29,12 @@ body:
    id: reproduce
    attributes:
      label: Steps to reproduce
-     description: List all steps needed to reproduce the problem':' \n\n - Go to '...'\n\n - Click on '....'\n\n - Scroll down to '....'\n\n - See error
-     value: |
-       1.
+     description: "List all steps needed to reproduce the problem: \n\n - Go to '...'\n\n - Click on '....'\n\n - Scroll down to '....'\n\n - See error"
+     placeholder: |
+       1. Go to '...'
+       2. Click on '...'
+       3. Scroll down to '...'
+       4. See error
    validations:
      required: true
  - type: textarea
@@ -107,6 +110,10 @@ body:
    id: severity
    attributes:
      label: Severity
-     description: List all steps needed to reproduce the problem':' \n\n - Go to '...'\n\n - Click on '....'\n\n - Scroll down to '....'\n\n - See error
-     value: |
-       To be added after bug submission by internal support / PM\n\n - How critical is the impact of this bug on a user?\n\n - Add stats if available on % of customers impacted\n\n - Is this visible to all users?\n\n - Is this tech debt?
+     description: |
+       To be added after bug submission by internal support / PM:
+       
+       - How critical is the impact of this bug on a user?
+       - Add stats if available on % of customers impacted
+       - Is this visible to all users?
+       - Is this tech debt?
