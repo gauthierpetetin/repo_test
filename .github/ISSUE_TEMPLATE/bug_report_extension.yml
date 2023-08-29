@@ -1,6 +1,6 @@
 name: Bug Report Extension
-description: Using MetaMask, but it's not working as you expect?
-title: "[Bug]: "
+description: Using MetaMask Extension, but it's not working as you expect?
+title: "[Extension Bug]: "
 labels: ["type-bug"]
 body:
  - type: markdown
