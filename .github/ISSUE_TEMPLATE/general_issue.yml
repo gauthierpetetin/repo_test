@@ -1,7 +1,7 @@
 name: "General issue"
 description: "This is a test issue"
 title: "[Bug]: "
-labels: ["type-bug"]
+labels: []
 body:
  - type: markdown
    attributes:
