@@ -1,40 +1,40 @@
 ## **Description**
-Write a short description of the changes included in this pull request, also include relevant motivation and context. Have in mind the following questions:
-1. What is the reason for the change?
-2. What is the improvement/solution?
+_Write a short description of the changes included in this pull request, also include relevant motivation and context. Have in mind the following questions:_
+_1. What is the reason for the change?_
+_2. What is the improvement/solution?_
 
 ## **Screenshots/Recordings**
 
-If applicable, add screenshots and/or recordings to visualize the before and after of your change.
+_If applicable, add screenshots and/or recordings to visualize the before and after of your change._
 
 ### **Before**
 
-[screenshot]
+_[screenshot]_
 
 ### **After**
 
-[screenshot]
+_[screenshot]_
 
 ## **Manual testing steps**
 
-1. Step1:
-2. Step2:
-3. ...
+_1. Step1:_
+_2. Step2:_
+_3. ..._
 
 ## **Pre-merge author checklist**
 
-- [ ] I’ve followed MetaMask Coding Standards
+- [ ] I’ve followed MetaMask Coding Standards.
 - [ ] I've clearly explained:
-  - [ ] What problem this PR is solving
-  - [ ] How this problem was solved
-  - [ ] How reviewers can test my changes
+  - [ ] What problem this PR is solving.
+  - [ ] How this problem was solved.
+  - [ ] How reviewers can test my changes.
 - [ ] I’ve indicated what issue this PR is linked to: fixes #???
-- [ ] I’ve included tests if applicable
-- [ ] I’ve documented any added code
-- [ ] I’ve applied the right labels on the PR (see labeling guidelines)
-- [ ] I’ve marked the pull request as "ready for review", by changing its status from draft to non-draft
+- [ ] I’ve included tests if applicable.
+- [ ] I’ve documented any added code.
+- [ ] I’ve applied the right labels on the PR (see labeling guidelines).
+- [ ] I’ve marked the pull request as "ready for review", by changing its status from draft to non-draft.
 
 ## **Pre-merge reviewer checklist**
 
-- [ ] I've manually tested the PR (e.g. pull and build branch, run the app, test code being changed)
+- [ ] I've manually tested the PR (e.g. pull and build branch, run the app, test code being changed).
 - [ ] I confirm that this PR addresses all acceptance criteria described in the ticket it closes and includes the necessary testing evidence such as recordings and or screenshots.
