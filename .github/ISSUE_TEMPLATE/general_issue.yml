@@ -11,7 +11,7 @@ body:
         ## **Description**
 
   - type: textarea
-    id: description
+    id: description-test
     attributes:
       label: What is this about?
       placeholder: Describe the issue here.
