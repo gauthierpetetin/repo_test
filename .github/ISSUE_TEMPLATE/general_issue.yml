@@ -1,104 +1,64 @@
 name: General issue
-about: For any issues
-title: ""
-labels: []
-assignees: []
-
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["octo-org/1", "octo-org/44"]
+assignees:
+  - octocat
 body:
   - type: markdown
     attributes:
       value: |
-        ## **Description**
-
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
   - type: textarea
-    id: description
+    id: what-happened
     attributes:
-      label: What is this about?
-      placeholder: Describe the issue here.
-
-  - type: markdown
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: dropdown
+    id: version
     attributes:
-      value: |
-        ## **Scenario (for user stories only)**
-
+      label: Version
+      description: What version of our software are you running?
+      options:
+        - 1.0.2 (Default)
+        - 1.0.3 (Edge)
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
   - type: textarea
-    id: scenario
+    id: logs
     attributes:
-      label: Scenario
-      placeholder: |
-        - GIVEN a user is in x state
-        - WHEN a user does x
-        - AND a user does x
-        - THEN x should occur
-
-  - type: markdown
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: checkboxes
+    id: terms
     attributes:
-      value: |
-        ## **Design (for user stories only)**
-
-  - type: textarea
-    id: design
-    attributes:
-      label: Design
-      placeholder: Link to Figma design or screenshots
-
-  - type: markdown
-    attributes:
-      value: |
-        ## **Technical Details (for technical tasks only)**
-
-  - type: textarea
-    id: technical-details
-    attributes:
-      label: Technical Details
-      placeholder: |
-        - Implementation details
-        - Insight to what needs to be done
-        - Etc.
-
-  - type: markdown
-    attributes:
-      value: |
-        ## **[Threat Modeling Framework](https://github.com/adamshostack/4QuestionFrame) (for technical tasks only)**
-
-  - type: textarea
-    id: threat-modeling
-    attributes:
-      label: Threat Modeling Framework
-      placeholder: |
-        - What are we working on? What does this aim to solve?
-        - What can go wrong?
-        - What are we going to do about it?
-        - Did we do a good job?
-
-  - type: markdown
-    attributes:
-      value: |
-        ## **Acceptance Criteria**
-
-  - type: textarea
-    id: acceptance-criteria
-    attributes:
-      label: Acceptance Criteria
-      placeholder: |
-        - Are metrics required?
-        - Are translations required?
-        - Cases to satisfy
-        - XYZ should work
-        - Etc.
-
-  - type: markdown
-    attributes:
-      value: |
-        ## **References**
-
-  - type: textarea
-    id: references
-    attributes:
-      label: References
-      placeholder: |
-        - References go here.
-        - Screenshots.
-        - Issue numbers. Links.
-        - Slack threads.
-        - Etc.
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
