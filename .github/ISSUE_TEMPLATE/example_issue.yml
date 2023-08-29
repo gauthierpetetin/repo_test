@@ -1,4 +1,4 @@
-name: General issue
+name: Example issue
 description: File a bug report
 title: "[Bug]: "
 labels: ["bug", "triage"]
