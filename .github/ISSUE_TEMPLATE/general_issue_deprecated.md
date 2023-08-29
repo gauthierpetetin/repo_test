@@ -1,6 +1,6 @@
 ---
-name: "General issue deprecated"
-about: "For any issues"
+name: "Example issue deprecated"
+about: "For any example of deprecated issues"
 title: "[Deprecated]: "
 labels: ''
 assignees: ''
