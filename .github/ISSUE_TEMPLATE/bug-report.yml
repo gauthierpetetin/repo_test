@@ -59,11 +59,11 @@ body:
        - Beta
        - Flask
        - Other (please specify exactly where you obtained this build in "Additional Context" section)
- - type: dropdown
+ - type: input
    id: phones
    attributes:
      label: Phone
-     description: Which phones have you seen the problem on?
+     description: Which phone have you seen the problem on?
      placeholder: |
        Brand and model of your phone
    validations:
