@@ -27,6 +27,6 @@ jobs:
         id: create-release-pr
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.BUG_REPORT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./scripts/create-release-pr.sh ${{ github.event.inputs.semver-version }}
