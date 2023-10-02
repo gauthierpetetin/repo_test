@@ -1,0 +1,31 @@
+name: Create Release Pull Request
+
+on:
+  workflow_dispatch:
+    inputs:
+      semver-version:
+        description: 'A semantic version. eg: x.x.x'
+        required: true
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: yarn
+      - name: Create Release PR
+        id: create-release-pr
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/create-release-pr.sh ${{ github.event.inputs.semver-version }}
