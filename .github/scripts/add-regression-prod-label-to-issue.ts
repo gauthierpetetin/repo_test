@@ -73,7 +73,7 @@ async function main(): Promise<void> {
 // This helper function checks if issue's body has a bug report format.
 function extractReleaseVersionFromIssueBody(issueBody: string): string | undefined {
   // Extract version from the issue body
-  const regex = /### Version\n\n(.*?)(?=\n\n|$)/s;
+  const regex = /### Version\n(.*?)(?=\n|$)/s;
   const versionMatch = issueBody.match(regex);
   const version = versionMatch?.[1]?.trim();
 
