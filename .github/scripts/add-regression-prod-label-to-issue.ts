@@ -9,7 +9,10 @@ interface Labelable {
   repoOwner: string;
   repoName: string;
   body: string;
-  labels: string[];
+  labels: {
+    id: string;
+    name: string;
+  }[];
 }
 
 main().catch((error: Error): void => {
@@ -58,13 +61,35 @@ async function main(): Promise<void> {
     const regressionProdLabelColor = '5319E7'; // violet
     const regressionProdLabelDescription = `Regression bug that was found in production in release ${releaseVersion}`;
 
-    // Add the regression prod label to the issue if required
-    if (!issue?.labels?.includes(regressionProdLabelName)) {
-      console.log(`Add ${regressionProdLabelName} label to issue ${issue?.number}.`);
-      await addLabelToLabelable(octokit, issue, regressionProdLabelName, regressionProdLabelColor, regressionProdLabelDescription); 
+    let regressionProdLabelFound: boolean = false;
+    const regressionProdLabelsToBeRemoved: {
+      id: string;
+      name: string;
+    }[] = [];
+
+    // Loop over issue's labels, to see if regression labels are either missing, or to be removed
+    issue?.labels?.forEach(label => {
+      if (label?.name === regressionProdLabelName) {
+        regressionProdLabelFound = true;
+      } else if (label?.name?.startsWith('regression-prod-')) {
+        regressionProdLabelsToBeRemoved.push(label);
+      }
+    });
+    
+    // Add the regression prod label to the issue if missing
+    if (regressionProdLabelFound) {
+      console.log(`Issue ${issue?.number} already has ${regressionProdLabelName} label.`); 
     } else {
-      console.log(`Issue ${issue?.number} already has ${regressionProdLabelName} label.`);
+      console.log(`Add ${regressionProdLabelName} label to issue ${issue?.number}.`);
+      await addLabelToLabelable(octokit, issue, regressionProdLabelName, regressionProdLabelColor, regressionProdLabelDescription);
     }
+
+    // Remove other regression prod label from the issue
+    await Promise.all(
+      regressionProdLabelsToBeRemoved.map(label => {
+        removeLabelFromLabelable(octokit, issue, label?.id);
+      })
+    );
   } else {
     console.log(`No release version was found in body of issue ${issue?.number}.`);
   }
@@ -203,6 +228,7 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
           body
           labels(first: 100) {
             nodes {
+              id
               name
             }
           }
@@ -218,6 +244,7 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
         body: string;
         labels: {
           nodes: {
+            id: string;
             name: string;
           }[];
         }
@@ -235,7 +262,7 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
     repoOwner: repoOwner,
     repoName: repoName,
     body: retrieveIssueResult?.repository?.issue?.body,
-    labels: retrieveIssueResult?.repository?.issue?.labels?.nodes?.map(obj => obj?.name),
+    labels: retrieveIssueResult?.repository?.issue?.labels?.nodes,
   }
 
   return issue;
@@ -260,4 +287,20 @@ async function addLabelToLabelable(octokit: InstanceType<typeof GitHub>, labelab
     labelIds: [labelId],
    });
 
+}
+
+// This function removes a label from a labelable object (i.e. a pull request or an issue)
+async function removeLabelFromLabelable(octokit: InstanceType<typeof GitHub>, labelable: Labelable, labelId: string): Promise<void> {
+  const removeLabelsFromLabelableMutation = `
+    mutation RemoveLabelsFromLabelable($labelableId: ID!, $labelIds: [ID!]!) {
+      removeLabelsFromLabelable(input: {labelableId: $labelableId, labelIds: $labelIds}) {
+        clientMutationId
+      }
+    }
+  `;
+
+  await octokit.graphql(removeLabelsFromLabelableMutation, {
+    labelableId: labelable?.id,
+    labelIds: [labelId],
+  });
 }
