@@ -18,9 +18,14 @@ main().catch((error: Error): void => {
 });
 
 async function main(): Promise<void> {
-  const githubToken = process.env.GITHUB_TOKEN;
-  if (!githubToken) {
-    core.setFailed('GITHUB_TOKEN not found');
+  // "GITHUB_TOKEN" is an automatically generated, repository-specific access token provided by GitHub Actions.
+  // We can't use "GITHUB_TOKEN" here, as its permissions don't allow to create new labels.
+  // As we may want create "regression-prod-x.y.z" label when it doesn't already exist,
+  // we need to create our own "REGRESSION_PROD_LABEL_TOKEN" with "repo" permissions.
+  // Such a token allows to access other repositories of the MetaMask organisation.
+  const personalAccessToken = process.env.REGRESSION_PROD_LABEL_TOKEN;
+  if (!personalAccessToken) {
+    core.setFailed('REGRESSION_PROD_LABEL_TOKEN not found');
     process.exit(1);
   }
 
@@ -35,7 +40,7 @@ async function main(): Promise<void> {
 
   // Initialise octokit, required to call Github GraphQL API
   const octokit: InstanceType<typeof GitHub> = getOctokit(
-    githubToken,
+    personalAccessToken,
     {
       previews: ["bane"], // The "bane" preview is required for adding, updating, creating and deleting labels.
     },

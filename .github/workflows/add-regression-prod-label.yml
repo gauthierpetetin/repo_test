@@ -27,5 +27,5 @@ jobs:
       - name: Add regression prod label to issue
         id: add-regression-prod-label-to-issue
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REGRESSION_PROD_LABEL_TOKEN: ${{ secrets.REGRESSION_PROD_LABEL_TOKEN }}
         run: npm run add-regression-prod-label-to-issue
