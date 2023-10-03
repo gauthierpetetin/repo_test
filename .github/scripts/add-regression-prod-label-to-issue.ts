@@ -52,23 +52,30 @@ async function main(): Promise<void> {
   // Extract release version from issue body (is existing)
   const releaseVersion = extractReleaseVersionFromIssueBody(issue.body);
 
-  // Craft regression prod label to add
-  const regressionProdLabelName = `regression-prod-${releaseVersion}`;
-  const regressionProdLabelColor = '5319E7'; // violet
-  const regressionProdLabelDescription = `Regression bug that was found in production in release ${releaseVersion}`;
+  if (releaseVersion) {
+    // Craft regression prod label to add
+    const regressionProdLabelName = `regression-prod-${releaseVersion}`;
+    const regressionProdLabelColor = '5319E7'; // violet
+    const regressionProdLabelDescription = `Regression bug that was found in production in release ${releaseVersion}`;
 
-  // Add the regression prod label to the issue if required
-  if (!issue?.labels?.includes(regressionProdLabelName)) {
-    await addLabelToLabelable(octokit, issue, regressionProdLabelName, regressionProdLabelColor, regressionProdLabelDescription); 
+    // Add the regression prod label to the issue if required
+    if (!issue?.labels?.includes(regressionProdLabelName)) {
+      console.log(`Add ${regressionProdLabelName} label to issue ${issue?.number}.`);
+      await addLabelToLabelable(octokit, issue, regressionProdLabelName, regressionProdLabelColor, regressionProdLabelDescription); 
+    } else {
+      console.log(`Issue ${issue?.number} already has ${regressionProdLabelName} label.`);
+    }
+  } else {
+    console.log(`No release version was found in body of issue ${issue?.number}.`);
   }
 }
 
 // This helper function checks if issue's body has a bug report format.
 function extractReleaseVersionFromIssueBody(issueBody: string): string | undefined {
   // Extract version from the issue body
-  const regex = /### Version\n\n(.*?)(?=\n\n)/s;
+  const regex = /### Version\n\n(.*?)(?=\n\n|$)/s;
   const versionMatch = issueBody.match(regex);
-  const version = versionMatch?.[1];
+  const version = versionMatch?.[1]?.trim();
 
   // Check if version is in the format x.y.z
   if (version && !/^(\d+\.)?(\d+\.)?(\*|\d+)$/.test(version)) {
