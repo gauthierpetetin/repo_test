@@ -54,7 +54,7 @@ async function main(): Promise<void> {
 
   // Craft regression prod label to add
   const regressionProdLabelName = `regression-prod-${releaseVersion}`;
-  const regressionProdLabelColor = '5319E7';
+  const regressionProdLabelColor = '5319E7'; // violet
   const regressionProdLabelDescription = `Regression bug that was found in production in release ${releaseVersion}`;
 
   // Add the regression prod label to the issue if required
@@ -64,9 +64,9 @@ async function main(): Promise<void> {
 }
 
 // This helper function checks if issue's body has a bug report format.
-function extractReleaseVersionFromIssueBody(issueBody: string): string | undefined {
+function extractReleaseVersionFromIssueBody(issueBody: string): string | undefined {
   // Extract version from the issue body
-  const regex = /### Version\n\n(.*)\n/;
+  const regex = /### Version\n\n(.*?)(?=\n\n)/s;
   const versionMatch = issueBody.match(regex);
   const version = versionMatch?.[1];
 
