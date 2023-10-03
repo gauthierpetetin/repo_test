@@ -76,7 +76,7 @@ function extractReleaseVersionFromIssueBody(issueBody: string): string | undefin
   const cleanedIssueBody = issueBody.replace(/\r?\n/g, ' ');
 
   // Extract version from the cleaned issue body
-  const regex = /### Version ((.*?)(?= |$))/;
+  const regex = /### Version\s+((.*?)(?=  |$))/;
   const versionMatch = cleanedIssueBody.match(regex);
   const version = versionMatch?.[1];
 
