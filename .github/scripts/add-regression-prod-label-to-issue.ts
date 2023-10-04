@@ -16,6 +16,10 @@ interface Labelable {
   }[];
 }
 
+// Regex of our two issues templates ('general-issue.yml' and 'bug-report.yml' issue)
+const generalIssueTemplateRegex = /^#{3} What is this about\\?(?:.|\n)*?#{3} Scenario(?:.|\n)*?#{3} Design(?:.|\n)*?#{3} Technical Details(?:.|\n)*?#{3} Threat Modeling Framework(?:.|\n)*?#{3} Acceptance Criteria(?:.|\n)*?#{3} References/;
+const bugReportTemplateRegex = /^#{3} Describe the bug(?:.|\n)*?#{3} Expected behavior(?:.|\n)*?#{3} Screenshots(?:.|\n)*?#{3} Steps to reproduce(?:.|\n)*?#{3} Error messages or log output(?:.|\n)*?#{3} Version(?:.|\n)*?#{3} Build type(?:.|\n)*?#{3} Browser(?:.|\n)*?#{3} Operating system(?:.|\n)*?#{3} Hardware wallet(?:.|\n)*?#{3} Additional context(?:.|\n)*?#{3} Severity/;
+
 main().catch((error: Error): void => {
   console.error(error);
   process.exit(1);
@@ -54,6 +58,9 @@ async function main(): Promise<void> {
 
   // Retrieve issue
   const issue: Labelable = await retrieveIssue(octokit, issueRepoOwner, issueRepoName, issueNumber);
+
+  // Prior any further action, check if issue's body matches one of the two issues templates ('general-issue.yml' or 'bug-report.yml')
+  validateIssueBody(issue.body);
 
   // Retrieve issue's author list of organisations
   const orgs: string[] = await retrieveUserOrgs(octokit, issue?.author);
@@ -110,6 +117,17 @@ async function main(): Promise<void> {
     );
   } else {
     console.log(`No release version was found in body of issue ${issue?.number}.`);
+  }
+}
+
+// This helper function checks if issue's body matches one of the two issues templates ('general-issue.yml' or 'bug-report.yml').
+function validateIssueBody(str: string) {
+  if (generalIssueTemplateRegex.test(str)) {
+    console.log("Issue matches 'general-issue.yml' template.");
+  } else if(bugReportTemplateRegex.test(str)) {
+    console.log("Issue matches 'bug-report.yml' template.");
+  } else {
+    throw new Error("Issue body does not match any of expected templates ('general-issue.yml' or 'bug-report.yml').");
   }
 }
 
