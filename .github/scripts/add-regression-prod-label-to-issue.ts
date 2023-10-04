@@ -34,9 +34,10 @@ const bugReportTemplateTitles = [
   '### Error messages or log output',
   '### Version',
   '### Build type',
-  '### Browser',
+  '### Browser', // Only for Extension
+  // '### Device', // Only for Mobile
   '### Operating system',
-  '### Hardware wallet',
+  '### Hardware wallet', // Only for Extension
   '### Additional context',
   '### Severity'
 ];
