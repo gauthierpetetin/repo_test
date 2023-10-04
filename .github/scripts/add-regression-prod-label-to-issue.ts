@@ -16,9 +16,30 @@ interface Labelable {
   }[];
 }
 
-// Regex of our two issues templates ('general-issue.yml' and 'bug-report.yml' issue)
-const generalIssueTemplateRegex = /^#{3} What is this about\\?(?:.|\n)*?#{3} Scenario(?:.|\n)*?#{3} Design(?:.|\n)*?#{3} Technical Details(?:.|\n)*?#{3} Threat Modeling Framework(?:.|\n)*?#{3} Acceptance Criteria(?:.|\n)*?#{3} References/;
-const bugReportTemplateRegex = /^#{3} Describe the bug(?:.|\n)*?#{3} Expected behavior(?:.|\n)*?#{3} Screenshots(?:.|\n)*?#{3} Steps to reproduce(?:.|\n)*?#{3} Error messages or log output(?:.|\n)*?#{3} Version(?:.|\n)*?#{3} Build type(?:.|\n)*?#{3} Browser(?:.|\n)*?#{3} Operating system(?:.|\n)*?#{3} Hardware wallet(?:.|\n)*?#{3} Additional context(?:.|\n)*?#{3} Severity/;
+// Titles of our two issues templates ('general-issue.yml' and 'bug-report.yml' issue)
+const generalIssueTemplateTitles = [
+  '### What is this about?',
+  '### Scenario', 
+  '### Design',
+  '### Technical Details',
+  '### Threat Modeling Framework',
+  '### Acceptance Criteria',
+  '### References'
+];
+const bugReportTemplateTitles = [
+  '### Describe the bug',
+  '### Expected behavior', 
+  '### Screenshots',
+  '### Steps to reproduce',
+  '### Error messages or log output',
+  '### Version',
+  '### Build type',
+  '### Browser',
+  '### Operating system',
+  '### Hardware wallet',
+  '### Additional context',
+  '### Severity'
+];
 
 main().catch((error: Error): void => {
   console.error(error);
@@ -121,10 +142,24 @@ async function main(): Promise<void> {
 }
 
 // This helper function checks if issue's body matches one of the two issues templates ('general-issue.yml' or 'bug-report.yml').
-function validateIssueBody(str: string) {
-  if (generalIssueTemplateRegex.test(str)) {
+function validateIssueBody(issueBody: string) {
+  let missingGeneralIssueTitle: boolean = false;
+  for (const title of generalIssueTemplateTitles) {
+    if (!issueBody.includes(title)) {
+      missingGeneralIssueTitle = true;
+    }
+  }
+
+  let missingBugReportTitle: boolean = false;
+  for (const title of bugReportTemplateTitles) {
+    if (!issueBody.includes(title)) {
+      missingBugReportTitle = true;
+    }
+  }
+
+  if (!missingGeneralIssueTitle) {
     console.log("Issue matches 'general-issue.yml' template.");
-  } else if(bugReportTemplateRegex.test(str)) {
+  } else if(!missingBugReportTitle) {
     console.log("Issue matches 'bug-report.yml' template.");
   } else {
     throw new Error("Issue body does not match any of expected templates ('general-issue.yml' or 'bug-report.yml').");
