@@ -9,6 +9,7 @@ interface Labelable {
   repoOwner: string;
   repoName: string;
   body: string;
+  author: string;
   labels: {
     id: string;
     name: string;
@@ -52,9 +53,24 @@ async function main(): Promise<void> {
   // Retrieve issue
   const issue: Labelable = await retrieveIssue(octokit, issueRepoOwner, issueRepoName, issueNumber);
 
+  // Retrieve issue's author list of organisations
+  const orgs: string[] = await retrieveUserOrgs(octokit, issue?.author);
+
+  // Add external contributor label to the issue if author is not part of the MetaMask organisation
+  if (!orgs.includes('MetaMask')) {
+    // Craft external contributor label to add
+    const externalContributorLabelName = `external-contributor`;
+    const externalContributorLabelColor = 'B60205'; // red
+    const externalContributorLabelDescription = `Issue or PR created by user outside MetaMask organisation`;
+
+    // Add external contributor label to the issue
+    await addLabelToLabelable(octokit, issue, externalContributorLabelName, externalContributorLabelColor, externalContributorLabelDescription);
+  }
+
   // Extract release version from issue body (is existing)
   const releaseVersion = extractReleaseVersionFromIssueBody(issue.body);
 
+  // Add regression prod label to the issue if release version was found is issue body
   if (releaseVersion) {
     // Craft regression prod label to add
     const regressionProdLabelName = `regression-prod-${releaseVersion}`;
@@ -76,7 +92,7 @@ async function main(): Promise<void> {
       }
     });
     
-    // Add the regression prod label to the issue if missing
+    // Add regression prod label to the issue if missing
     if (regressionProdLabelFound) {
       console.log(`Issue ${issue?.number} already has ${regressionProdLabelName} label.`); 
     } else {
@@ -226,6 +242,9 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
         issue(number: $issueNumber) {
           id
           body
+          author {
+            login
+          }
           labels(first: 100) {
             nodes {
               id
@@ -242,6 +261,9 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
       issue: {
         id: string;
         body: string;
+        author: {
+          login: string;
+        }
         labels: {
           nodes: {
             id: string;
@@ -262,6 +284,7 @@ async function retrieveIssue(octokit: InstanceType<typeof GitHub>, repoOwner: st
     repoOwner: repoOwner,
     repoName: repoName,
     body: retrieveIssueResult?.repository?.issue?.body,
+    author: retrieveIssueResult?.repository?.issue?.author?.login,
     labels: retrieveIssueResult?.repository?.issue?.labels?.nodes,
   }
 
@@ -303,4 +326,34 @@ async function removeLabelFromLabelable(octokit: InstanceType<typeof GitHub>, la
     labelableId: labelable?.id,
     labelIds: [labelId],
   });
+}
+
+// This function retrieves the list of organizations a specific user belongs to
+async function retrieveUserOrgs(octokit: InstanceType<typeof GitHub>, username: string): Promise<string[]> {
+  const userOrgsQuery = `
+    query UserOrgs($login: String!) {
+      user(login: $login) {
+        organizations(first: 100) {
+          nodes {
+            login
+          }
+        }
+      }
+    }
+  `;
+
+  const retrieveUserOrgsResult: {
+    user: {
+      organizations: {
+        nodes: {
+          login: string;
+        }[]
+      }
+    }
+  } = await octokit.graphql(userOrgsQuery, { login: username });
+
+  // Extract the organization logins from the result
+  const orgs = retrieveUserOrgsResult.user.organizations.nodes.map((node: { login: string }) => node.login);
+
+  return orgs;
 }
