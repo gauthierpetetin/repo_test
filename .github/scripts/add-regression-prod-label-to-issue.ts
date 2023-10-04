@@ -23,10 +23,12 @@ main().catch((error: Error): void => {
 
 async function main(): Promise<void> {
   // "GITHUB_TOKEN" is an automatically generated, repository-specific access token provided by GitHub Actions.
-  // We can't use "GITHUB_TOKEN" here, as its permissions don't allow to create new labels.
-  // As we may want create "regression-prod-x.y.z" label when it doesn't already exist,
-  // we need to create our own "REGRESSION_PROD_LABEL_TOKEN" with "repo" permissions.
-  // Such a token allows to access other repositories of the MetaMask organisation.
+  // We can't use "GITHUB_TOKEN" here, as its permissions don't allow neither to create new labels
+  // nor to retrieve the list of organisations a user belongs to.
+  // In our case, we may want to create "regression-prod-x.y.z" label when it doesn't already exist.
+  // We may also want to retrieve the list of organisations a user belongs to.
+  // As a consequence, we need to create our own "REGRESSION_PROD_LABEL_TOKEN" with "repo" and "read:org" permissions.
+  // Such a token allows both to create new labels and fetch user's list of organisations.
   const personalAccessToken = process.env.REGRESSION_PROD_LABEL_TOKEN;
   if (!personalAccessToken) {
     core.setFailed('REGRESSION_PROD_LABEL_TOKEN not found');
