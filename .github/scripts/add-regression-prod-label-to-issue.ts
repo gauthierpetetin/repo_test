@@ -81,9 +81,6 @@ async function main(): Promise<void> {
   // Retrieve issue
   const issue: Labelable = await retrieveIssue(octokit, issueRepoOwner, issueRepoName, issueNumber);
 
-  // Prior any further action, check if issue's body matches one of the two issues templates ('general-issue.yml' or 'bug-report.yml')
-  validateIssueBody(issue.body);
-
   // Retrieve issue's author list of organisations
   const orgs: string[] = await retrieveUserOrgs(octokit, issue?.author);
 
@@ -97,6 +94,9 @@ async function main(): Promise<void> {
     // Add external contributor label to the issue
     await addLabelToLabelable(octokit, issue, externalContributorLabelName, externalContributorLabelColor, externalContributorLabelDescription);
   }
+
+  // Prior any further action, check if issue's body matches one of the two issues templates ('general-issue.yml' or 'bug-report.yml')
+  validateIssueBody(issue.body);
 
   // Extract release version from issue body (is existing)
   const releaseVersion = extractReleaseVersionFromIssueBody(issue.body);
