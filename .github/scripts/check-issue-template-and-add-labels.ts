@@ -36,7 +36,7 @@ const generalIssueTemplateTitles = [
 const bugReportTemplateTitles = [
   '### Describe the bug',
   '### Expected behavior', 
-  '### Screenshots',
+  '### Screenshots/Recordings',
   '### Steps to reproduce',
   '### Error messages or log output',
   '### Version',
@@ -51,12 +51,12 @@ const bugReportTemplateTitles = [
 
 // External contributor label
 const externalContributorLabelName = `external-contributor`;
-const externalContributorLabelColor = 'B60205'; // red
+const externalContributorLabelColor = 'EDEDED'; // grey
 const externalContributorLabelDescription = `Issue or PR created by user outside MetaMask organisation`;
 
 // Craft invalid issue template label
 const invalidIssueTemplateLabelName = `INVALID-ISSUE-TEMPLATE`;
-const invalidIssueTemplateLabelColor = 'B60205'; // red
+const invalidIssueTemplateLabelColor = 'EDEDED'; // grey
 const invalidIssueTemplateLabelDescription = `Issue's body doesn't match any issue template.`;
 
 main().catch((error: Error): void => {
