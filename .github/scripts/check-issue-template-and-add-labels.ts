@@ -51,7 +51,7 @@ const bugReportTemplateTitles = [
 
 // External contributor label
 const externalContributorLabelName = `external-contributor`;
-const externalContributorLabelColor = 'EDEDED'; // grey
+const externalContributorLabelColor = 'B60205'; // red
 const externalContributorLabelDescription = `Issue or PR created by user outside MetaMask organisation`;
 
 // Craft invalid issue template label
