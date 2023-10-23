@@ -35,7 +35,7 @@ _Fixes #???_
 - [ ] I’ve indicated what issue this PR is linked to: Fixes #???
 - [ ] I’ve included tests if applicable.
 - [ ] I’ve documented any added code.
-- [ ] I’ve applied the right labels on the PR (see [labeling guidelines](https://github.com/gauthierpetetin-test/repo_test/blob/main/.github/guidelines/LABELING_GUIDELINES_MOBILE.md)).
+- [ ] I’ve applied the right labels on the PR (see [labeling guidelines](https://github.com/gauthierpetetin-test/repo_test/blob/main/.github/guidelines/LABELING_GUIDELINES_MOBILE.md)). Not required for external contributors.
 - [ ] I’ve properly set the pull request status:
   - [ ] In case it's not yet "ready for review", I've set it to "draft".
   - [ ] In case it's "ready for review", I've changed it from "draft" to "non-draft".
